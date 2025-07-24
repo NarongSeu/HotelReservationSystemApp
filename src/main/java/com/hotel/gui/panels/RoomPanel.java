@@ -2,16 +2,17 @@ package com.hotel.gui.panels;
 
 import com.hotel.dao.RoomDAO;
 import com.hotel.model.Room;
+import com.hotel.gui.ModernColors;
+import com.hotel.gui.components.ModernTable;
+import com.hotel.gui.components.ModernFormPanel;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.util.List;
 
 public class RoomPanel extends JPanel {
-    private JTable roomTable;
+    private ModernTable roomTable;
     private DefaultTableModel tableModel;
     private RoomDAO roomDAO;
     private JTextField roomNumberField, roomTypeField, priceField;
@@ -25,7 +26,9 @@ public class RoomPanel extends JPanel {
     }
     
     private void initializeComponents() {
-        // Table setup
+        setBackground(ModernColors.MAIN_BACKGROUND);
+        
+        // Table setup - exactly like reference
         String[] columnNames = {"ID", "Room Number", "Room Type", "Price", "Status"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
@@ -33,93 +36,102 @@ public class RoomPanel extends JPanel {
                 return false;
             }
         };
-        roomTable = new JTable(tableModel);
-        roomTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        roomTable = new ModernTable(tableModel);
         
         // Form fields
-        roomNumberField = new JTextField(15);
-        roomTypeField = new JTextField(15);
-        priceField = new JTextField(15);
-        statusComboBox = new JComboBox<>(new String[]{"Available", "Occupied", "Maintenance", "Out of Order"});
+        roomNumberField = ModernFormPanel.createModernTextField();
+        roomTypeField = ModernFormPanel.createModernTextField();
+        priceField = ModernFormPanel.createModernTextField();
+        statusComboBox = ModernFormPanel.createModernComboBox(new String[]{"Available", "Occupied", "Maintenance", "Out of Order"});
     }
     
     private void setupLayout() {
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
         
-        // Title
+        // Title - exactly like reference
         JLabel titleLabel = new JLabel("Room Management");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
+        titleLabel.setForeground(new Color(55, 65, 81));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 25, 0));
         add(titleLabel, BorderLayout.NORTH);
         
-        // Center panel with table
-        JScrollPane scrollPane = new JScrollPane(roomTable);
-        scrollPane.setPreferredSize(new Dimension(0, 400));
-        add(scrollPane, BorderLayout.CENTER);
+        // Main content
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setOpaque(false);
         
-        // Bottom panel with form and buttons
-        JPanel bottomPanel = createBottomPanel();
-        add(bottomPanel, BorderLayout.SOUTH);
-    }
-    
-    private JPanel createBottomPanel() {
-        JPanel bottomPanel = new JPanel(new BorderLayout());
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
+        // Table panel with white background and border - exactly like reference
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        tablePanel.setBackground(Color.WHITE);
+        tablePanel.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240), 1));
+        
+        JScrollPane scrollPane = new JScrollPane(roomTable);
+        scrollPane.setBorder(null);
+        scrollPane.getViewport().setBackground(Color.WHITE);
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
+        
+        mainPanel.add(tablePanel, BorderLayout.CENTER);
         
         // Form panel
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBorder(BorderFactory.createTitledBorder("Room Details"));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        JPanel formPanel = createFormPanel();
+        mainPanel.add(formPanel, BorderLayout.SOUTH);
         
-        // Room Number
-        gbc.gridx = 0; gbc.gridy = 0;
-        formPanel.add(new JLabel("Room Number:"), gbc);
-        gbc.gridx = 1;
-        formPanel.add(roomNumberField, gbc);
-        
-        // Room Type
-        gbc.gridx = 2; gbc.gridy = 0;
-        formPanel.add(new JLabel("Room Type:"), gbc);
-        gbc.gridx = 3;
-        formPanel.add(roomTypeField, gbc);
-        
-        // Price
-        gbc.gridx = 0; gbc.gridy = 1;
-        formPanel.add(new JLabel("Price:"), gbc);
-        gbc.gridx = 1;
-        formPanel.add(priceField, gbc);
-        
-        // Status
-        gbc.gridx = 2; gbc.gridy = 1;
-        formPanel.add(new JLabel("Status:"), gbc);
-        gbc.gridx = 3;
-        formPanel.add(statusComboBox, gbc);
-        
-        bottomPanel.add(formPanel, BorderLayout.CENTER);
-        
-        // Button panel
-        JPanel buttonPanel = createButtonPanel();
-        bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
-        
-        return bottomPanel;
+        add(mainPanel, BorderLayout.CENTER);
     }
     
-    private JPanel createButtonPanel() {
-        JPanel buttonPanel = new JPanel(new FlowLayout());
+    private JPanel createFormPanel() {
+        ModernFormPanel formPanel = new ModernFormPanel("Room Details");
+        formPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createEmptyBorder(20, 0, 0, 0),
+            BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
+                BorderFactory.createEmptyBorder(20, 20, 20, 20)
+            )
+        ));
         
-        JButton addButton = new JButton("Add Room");
-        JButton updateButton = new JButton("Update Room");
-        JButton deleteButton = new JButton("Delete Room");
-        JButton clearButton = new JButton("Clear");
+        JPanel fieldsPanel = new JPanel(new GridBagLayout());
+        fieldsPanel.setOpaque(false);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        
+        // Row 1
+        gbc.gridx = 0; gbc.gridy = 0;
+        fieldsPanel.add(createFieldLabel("Room Number:"), gbc);
+        gbc.gridx = 1;
+        fieldsPanel.add(roomNumberField, gbc);
+        
+        gbc.gridx = 2;
+        fieldsPanel.add(createFieldLabel("Room Type:"), gbc);
+        gbc.gridx = 3;
+        fieldsPanel.add(roomTypeField, gbc);
+        
+        // Row 2
+        gbc.gridx = 0; gbc.gridy = 1;
+        fieldsPanel.add(createFieldLabel("Price:"), gbc);
+        gbc.gridx = 1;
+        fieldsPanel.add(priceField, gbc);
+        
+        gbc.gridx = 2;
+        fieldsPanel.add(createFieldLabel("Status:"), gbc);
+        gbc.gridx = 3;
+        fieldsPanel.add(statusComboBox, gbc);
+        
+        formPanel.add(fieldsPanel, BorderLayout.CENTER);
+        
+        // Buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
+        buttonPanel.setOpaque(false);
+        
+        JButton addButton = ModernFormPanel.createModernButton("Add Room", new Color(34, 197, 94));
+        JButton updateButton = ModernFormPanel.createModernButton("Update Room", new Color(59, 130, 246));
+        JButton deleteButton = ModernFormPanel.createModernButton("Delete Room", new Color(239, 68, 68));
+        JButton clearButton = ModernFormPanel.createModernButton("Clear", new Color(107, 114, 128));
         
         addButton.addActionListener(e -> addRoom());
         updateButton.addActionListener(e -> updateRoom());
         deleteButton.addActionListener(e -> deleteRoom());
         clearButton.addActionListener(e -> clearForm());
         
-        // Add selection listener to populate form
         roomTable.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 populateFormFromSelection();
@@ -131,7 +143,16 @@ public class RoomPanel extends JPanel {
         buttonPanel.add(deleteButton);
         buttonPanel.add(clearButton);
         
-        return buttonPanel;
+        formPanel.add(buttonPanel, BorderLayout.SOUTH);
+        
+        return formPanel;
+    }
+    
+    private JLabel createFieldLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Arial", Font.PLAIN, 13));
+        label.setForeground(new Color(75, 85, 99));
+        return label;
     }
     
     private void addRoom() {
@@ -245,7 +266,7 @@ public class RoomPanel extends JPanel {
                 room.getRoomId(),
                 room.getRoomNumber(),
                 room.getRoomType(),
-                room.getPrice(),
+                "$" + room.getPrice(),
                 room.getStatus()
             };
             tableModel.addRow(row);
