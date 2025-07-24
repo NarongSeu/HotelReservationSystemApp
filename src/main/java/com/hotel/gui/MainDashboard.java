@@ -136,11 +136,40 @@ public class MainDashboard extends JFrame {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeel());
+                // Try different look and feel options
+                setLookAndFeel();
             } catch (Exception e) {
-                e.printStackTrace();
+                System.err.println("Could not set look and feel: " + e.getMessage());
+                // Continue with default look and feel
             }
             new MainDashboard();
         });
+    }
+
+    private static void setLookAndFeel() {
+        try {
+            // Try system look and feel first
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeel());
+        } catch (Exception e1) {
+            try {
+                // Fallback to cross-platform look and feel
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeel());
+            } catch (Exception e2) {
+                try {
+                    // Fallback to Nimbus if available
+                    for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                        if ("Nimbus".equals(info.getName())) {
+                            UIManager.setLookAndFeel(info.getClassName());
+                            return;
+                        }
+                    }
+                    // If nothing works, use default Metal look and feel
+                    UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+                } catch (Exception e3) {
+                    // Use default look and feel
+                    System.err.println("Using default look and feel");
+                }
+            }
+        }
     }
 }

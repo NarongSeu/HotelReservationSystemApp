@@ -8,12 +8,8 @@ import java.awt.*;
 public class HotelReservationSystemApp {
     
     public static void main(String[] args) {
-        // Set system look and feel
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeel());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // Set system look and feel with fallback options
+        setLookAndFeel();
         
         // Show splash screen
         showSplashScreen();
@@ -27,6 +23,32 @@ public class HotelReservationSystemApp {
                 showDatabaseErrorDialog();
             }
         });
+    }
+
+    private static void setLookAndFeel() {
+        try {
+            // Try system look and feel first
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeel());
+        } catch (Exception e1) {
+            try {
+                // Fallback to cross-platform look and feel
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeel());
+            } catch (Exception e2) {
+                try {
+                    // Try Nimbus look and feel
+                    for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                        if ("Nimbus".equals(info.getName())) {
+                            UIManager.setLookAndFeel(info.getClassName());
+                            return;
+                        }
+                    }
+                    // Default Metal look and feel
+                    UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+                } catch (Exception e3) {
+                    System.err.println("Could not set look and feel, using default: " + e3.getMessage());
+                }
+            }
+        }
     }
     
     private static void showSplashScreen() {

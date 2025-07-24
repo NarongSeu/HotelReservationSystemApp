@@ -205,6 +205,43 @@ Solutions:
 3. Verify Maven is using correct Java version
 \`\`\`
 
+## Compilation Issues
+
+### Look and Feel Errors
+\`\`\`
+Error: "cannot find symbol: method getSystemLookAndFeel()"
+Solutions:
+1. The code has been updated with fallback options
+2. If still having issues, use Java 8 or higher
+3. The application will work with default look and feel
+\`\`\`
+
+### Quick Test Commands
+\`\`\`bash
+# Test database connection only
+mvn compile exec:java -Dexec.mainClass="com.hotel.test.DatabaseTest"
+
+# Run with specific look and feel
+java -Dswing.defaultlaf=javax.swing.plaf.nimbus.NimbusLookAndFeel -jar target/hotel-reservation-system-1.0.0-jar-with-dependencies.jar
+
+# Run with cross-platform look and feel
+java -Dswing.defaultlaf=javax.swing.plaf.metal.MetalLookAndFeel -jar target/hotel-reservation-system-1.0.0-jar-with-dependencies.jar
+\`\`\`
+
+### Alternative Compilation (without Maven)
+If Maven is not available, you can compile manually:
+
+\`\`\`bash
+# Create directories
+mkdir -p build/classes
+
+# Compile (make sure mysql-connector-j-9.3.0.jar is in classpath)
+javac -cp "mysql-connector-j-9.3.0.jar" -d build/classes src/main/java/com/hotel/**/*.java
+
+# Run
+java -cp "build/classes:mysql-connector-j-9.3.0.jar" com.hotel.HotelReservationSystemApp
+\`\`\`
+
 ## Project Structure
 
 \`\`\`
