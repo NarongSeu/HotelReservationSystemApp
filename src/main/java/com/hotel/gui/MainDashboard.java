@@ -72,7 +72,14 @@ public class MainDashboard extends JFrame {
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 30, 15, 30));
         headerPanel.setPreferredSize(new Dimension(0, 60));
         
-        // Only show "Admin User" on the right - no search bar
+        // Center title
+        JLabel titleLabel = new JLabel("Hotel Reservation System");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        titleLabel.setForeground(new Color(55, 65, 81));
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        headerPanel.add(titleLabel, BorderLayout.CENTER);
+        
+        // Admin User on the right
         JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         userPanel.setOpaque(false);
         
