@@ -10,20 +10,19 @@ public class StatCard extends GradientPanel {
     private JLabel changeLabel;
     private JLabel iconLabel;
     
-    public StatCard(String title, String value, String change, String icon, Color startColor, Color endColor) {
+    public StatCard(String title, String value, String change, JLabel iconLabel, Color startColor, Color endColor) {
         super(startColor, endColor, true);
-        initializeComponents(title, value, change, icon);
+        initializeComponents(title, value, change, iconLabel);
         setupLayout();
     }
     
-    private void initializeComponents(String title, String value, String change, String icon) {
+    private void initializeComponents(String title, String value, String change, JLabel iconLabel) {
         setPreferredSize(new Dimension(280, 120));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        // Icon
-        iconLabel = new JLabel(icon);
-        iconLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        iconLabel.setForeground(ModernColors.TEXT_WHITE);
+        // Use provided icon
+        this.iconLabel = iconLabel;
+        this.iconLabel.setForeground(ModernColors.TEXT_WHITE);
         
         // Title
         titleLabel = new JLabel(title);
