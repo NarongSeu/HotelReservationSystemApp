@@ -149,11 +149,11 @@ public class MainDashboard extends JFrame {
     private static void setLookAndFeel() {
         try {
             // Try system look and feel first
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeel());
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e1) {
             try {
                 // Fallback to cross-platform look and feel
-                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeel());
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             } catch (Exception e2) {
                 try {
                     // Fallback to Nimbus if available

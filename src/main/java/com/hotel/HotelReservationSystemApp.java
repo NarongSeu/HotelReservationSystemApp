@@ -33,12 +33,12 @@ public class HotelReservationSystemApp {
     private static void setLookAndFeel() {
         try {
             // Try system look and feel first
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeel());
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             System.out.println("Using system look and feel");
         } catch (Exception e1) {
             try {
                 // Fallback to cross-platform look and feel
-                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeel());
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
                 System.out.println("Using cross-platform look and feel");
             } catch (Exception e2) {
                 try {
