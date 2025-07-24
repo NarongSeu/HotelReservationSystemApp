@@ -121,7 +121,7 @@ public class MainDashboard extends JFrame {
         logoPanel.setOpaque(false);
         logoPanel.setMaximumSize(new Dimension(250, 60));
         
-        JLabel logoIcon = new JLabel("🏨");
+        JLabel logoIcon = new JLabel("⌂"); // House symbol instead of hotel emoji
         logoIcon.setFont(new Font("Arial", Font.BOLD, 24));
         
         JLabel titleLabel = new JLabel("Hotel System");
@@ -135,7 +135,7 @@ public class MainDashboard extends JFrame {
         
         // Navigation buttons - centered
         String[] buttonNames = {"Dashboard", "Rooms", "Guests", "Reservations", "Billing"};
-        String[] buttonIcons = {"📊", "🏠", "👥", "📅", "💰"};
+        String[] buttonIcons = {"▣", "⌂", "⚪", "☰", "$"}; // Replace emoji with professional icons
         
         for (int i = 0; i < buttonNames.length; i++) {
             JPanel buttonWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
@@ -157,7 +157,7 @@ public class MainDashboard extends JFrame {
         logoutWrapper.setOpaque(false);
         logoutWrapper.setMaximumSize(new Dimension(250, 45));
         
-        JButton logoutButton = createModernNavButton("Logout", "🚪");
+        JButton logoutButton = createModernNavButton("Logout", "⏻"); // Power symbol instead of door emoji
         logoutWrapper.add(logoutButton);
         navPanel.add(logoutWrapper);
         
