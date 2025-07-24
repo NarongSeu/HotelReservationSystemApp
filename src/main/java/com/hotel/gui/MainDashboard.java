@@ -1,6 +1,7 @@
 package com.hotel.gui;
 
 import com.hotel.gui.panels.*;
+import com.hotel.gui.components.GradientPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -22,14 +23,16 @@ public class MainDashboard extends JFrame {
         setupLayout();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Hotel Reservation System");
-        setSize(1200, 800);
+        setSize(1400, 900);
         setLocationRelativeTo(null);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setVisible(true);
     }
     
     private void initializeComponents() {
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
+        contentPanel.setBackground(ModernColors.MAIN_BACKGROUND);
         
         // Initialize panels
         dashboardPanel = new DashboardPanel();
@@ -49,54 +52,132 @@ public class MainDashboard extends JFrame {
     private void setupLayout() {
         setLayout(new BorderLayout());
         
-        // Create navigation panel
-        JPanel navigationPanel = createNavigationPanel();
+        // Create modern navigation panel
+        JPanel navigationPanel = createModernNavigationPanel();
         add(navigationPanel, BorderLayout.WEST);
+        
+        // Create header panel
+        JPanel headerPanel = createHeaderPanel();
+        add(headerPanel, BorderLayout.NORTH);
+        
         add(contentPanel, BorderLayout.CENTER);
         
         // Show dashboard by default
         cardLayout.show(contentPanel, "Dashboard");
     }
     
-    private JPanel createNavigationPanel() {
-        JPanel navPanel = new JPanel();
+    private JPanel createHeaderPanel() {
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(ModernColors.CARD_BACKGROUND);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 30, 15, 30));
+        headerPanel.setPreferredSize(new Dimension(0, 70));
+        
+        // Search panel
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        searchPanel.setOpaque(false);
+        
+        JTextField searchField = new JTextField("Search...", 20);
+        searchField.setFont(new Font("Arial", Font.PLAIN, 14));
+        searchField.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
+            BorderFactory.createEmptyBorder(8, 12, 8, 12)
+        ));
+        searchField.setBackground(ModernColors.MAIN_BACKGROUND);
+        
+        searchPanel.add(searchField);
+        headerPanel.add(searchPanel, BorderLayout.WEST);
+        
+        // User info panel
+        JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        userPanel.setOpaque(false);
+        
+        JLabel userLabel = new JLabel("Admin User");
+        userLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        userLabel.setForeground(ModernColors.TEXT_PRIMARY);
+        
+        userPanel.add(userLabel);
+        headerPanel.add(userPanel, BorderLayout.EAST);
+        
+        return headerPanel;
+    }
+    
+    private JPanel createModernNavigationPanel() {
+        GradientPanel navPanel = new GradientPanel(ModernColors.SIDEBAR_START, ModernColors.SIDEBAR_END);
         navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.Y_AXIS));
-        navPanel.setBackground(new Color(52, 73, 94));
-        navPanel.setPreferredSize(new Dimension(200, 0));
-        navPanel.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
+        navPanel.setPreferredSize(new Dimension(250, 0));
+        navPanel.setBorder(BorderFactory.createEmptyBorder(30, 20, 30, 20));
         
         // Hotel logo/title
-        JLabel titleLabel = new JLabel("Hotel Management");
-        titleLabel.setForeground(Color.WHITE);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        navPanel.add(titleLabel);
-        navPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+        JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        logoPanel.setOpaque(false);
+        logoPanel.setMaximumSize(new Dimension(250, 60));
+        
+        JLabel logoIcon = new JLabel("🏨");
+        logoIcon.setFont(new Font("Arial", Font.BOLD, 24));
+        
+        JLabel titleLabel = new JLabel("Hotel System");
+        titleLabel.setForeground(ModernColors.TEXT_WHITE);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        
+        logoPanel.add(logoIcon);
+        logoPanel.add(titleLabel);
+        navPanel.add(logoPanel);
+        navPanel.add(Box.createRigidArea(new Dimension(0, 40)));
         
         // Navigation buttons
         String[] buttonNames = {"Dashboard", "Rooms", "Guests", "Reservations", "Billing"};
+        String[] buttonIcons = {"📊", "🏠", "👥", "📅", "💰"};
         
-        for (String buttonName : buttonNames) {
-            JButton button = createNavButton(buttonName);
+        for (int i = 0; i < buttonNames.length; i++) {
+            JButton button = createModernNavButton(buttonNames[i], buttonIcons[i]);
             navPanel.add(button);
-            navPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+            navPanel.add(Box.createRigidArea(new Dimension(0, 8)));
         }
+        
+        // Add flexible space
+        navPanel.add(Box.createVerticalGlue());
+        
+        // Logout button
+        JButton logoutButton = createModernNavButton("Logout", "🚪");
+        navPanel.add(logoutButton);
         
         return navPanel;
     }
     
-    private JButton createNavButton(String text) {
-        JButton button = new JButton(text);
-        button.setMaximumSize(new Dimension(180, 40));
-        button.setBackground(new Color(41, 128, 185));
-        button.setForeground(Color.WHITE);
+    private JButton createModernNavButton(String text, String icon) {
+        JButton button = new JButton();
+        button.setLayout(new BorderLayout());
+        button.setMaximumSize(new Dimension(210, 45));
+        button.setPreferredSize(new Dimension(210, 45));
+        button.setBackground(new Color(255, 255, 255, 0));
+        button.setForeground(ModernColors.TEXT_WHITE);
         button.setFocusPainted(false);
         button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
         button.setFont(new Font("Arial", Font.PLAIN, 14));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        // Icon label
+        JLabel iconLabel = new JLabel(icon);
+        iconLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        iconLabel.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 10));
+        
+        // Text label
+        JLabel textLabel = new JLabel(text);
+        textLabel.setForeground(ModernColors.TEXT_WHITE);
+        textLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        
+        button.add(iconLabel, BorderLayout.WEST);
+        button.add(textLabel, BorderLayout.CENTER);
         
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if ("Logout".equals(text)) {
+                    System.exit(0);
+                    return;
+                }
+                
                 cardLayout.show(contentPanel, text);
                 
                 // Refresh panels when switching
@@ -122,54 +203,21 @@ public class MainDashboard extends JFrame {
         
         // Hover effect
         button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(52, 152, 219));
+                button.setBackground(ModernColors.SIDEBAR_HOVER);
+                button.setOpaque(true);
+                button.repaint();
             }
+            
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(41, 128, 185));
+                button.setBackground(new Color(255, 255, 255, 0));
+                button.setOpaque(false);
+                button.repaint();
             }
         });
         
         return button;
-    }
-    
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                // Try different look and feel options
-                setLookAndFeel();
-            } catch (Exception e) {
-                System.err.println("Could not set look and feel: " + e.getMessage());
-                // Continue with default look and feel
-            }
-            new MainDashboard();
-        });
-    }
-
-    private static void setLookAndFeel() {
-        try {
-            // Try system look and feel first
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e1) {
-            try {
-                // Fallback to cross-platform look and feel
-                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-            } catch (Exception e2) {
-                try {
-                    // Fallback to Nimbus if available
-                    for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                        if ("Nimbus".equals(info.getName())) {
-                            UIManager.setLookAndFeel(info.getClassName());
-                            return;
-                        }
-                    }
-                    // If nothing works, use default Metal look and feel
-                    UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-                } catch (Exception e3) {
-                    // Use default look and feel
-                    System.err.println("Using default look and feel");
-                }
-            }
-        }
     }
 }
