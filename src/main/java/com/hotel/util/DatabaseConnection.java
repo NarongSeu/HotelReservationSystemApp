@@ -52,102 +52,86 @@ public class DatabaseConnection {
     
     private static void createTables(Statement stmt) throws SQLException {
         // Create Rooms table
-        String createRoomsTable = """
-            CREATE TABLE IF NOT EXISTS Rooms (
-                room_id INT PRIMARY KEY AUTO_INCREMENT,
-                room_number VARCHAR(10) NOT NULL UNIQUE,
-                room_type VARCHAR(50),
-                price DECIMAL(10,2),
-                status VARCHAR(20) DEFAULT 'Available'
-            )
-        """;
+        String createRoomsTable = "CREATE TABLE IF NOT EXISTS Rooms (" +
+            "room_id INT PRIMARY KEY AUTO_INCREMENT," +
+            "room_number VARCHAR(10) NOT NULL UNIQUE," +
+            "room_type VARCHAR(50)," +
+            "price DECIMAL(10,2)," +
+            "status VARCHAR(20) DEFAULT 'Available'" +
+            ")";
         
         // Create Guests table
-        String createGuestsTable = """
-            CREATE TABLE IF NOT EXISTS Guests (
-                guest_id INT PRIMARY KEY AUTO_INCREMENT,
-                full_name VARCHAR(100),
-                phone VARCHAR(20),
-                id_passport VARCHAR(50),
-                address TEXT
-            )
-        """;
+        String createGuestsTable = "CREATE TABLE IF NOT EXISTS Guests (" +
+            "guest_id INT PRIMARY KEY AUTO_INCREMENT," +
+            "full_name VARCHAR(100)," +
+            "phone VARCHAR(20)," +
+            "id_passport VARCHAR(50)," +
+            "address TEXT" +
+            ")";
         
         // Create Reservations table
-        String createReservationsTable = """
-            CREATE TABLE IF NOT EXISTS Reservations (
-                reservation_id INT PRIMARY KEY AUTO_INCREMENT,
-                guest_id INT,
-                room_id INT,
-                check_in_date DATE,
-                check_out_date DATE,
-                status VARCHAR(20) DEFAULT 'Confirmed',
-                FOREIGN KEY (guest_id) REFERENCES Guests(guest_id),
-                FOREIGN KEY (room_id) REFERENCES Rooms(room_id)
-            )
-        """;
+        String createReservationsTable = "CREATE TABLE IF NOT EXISTS Reservations (" +
+            "reservation_id INT PRIMARY KEY AUTO_INCREMENT," +
+            "guest_id INT," +
+            "room_id INT," +
+            "check_in_date DATE," +
+            "check_out_date DATE," +
+            "status VARCHAR(20) DEFAULT 'Confirmed'," +
+            "FOREIGN KEY (guest_id) REFERENCES Guests(guest_id)," +
+            "FOREIGN KEY (room_id) REFERENCES Rooms(room_id)" +
+            ")";
         
         // Create Billing table
-        String createBillingTable = """
-            CREATE TABLE IF NOT EXISTS Billing (
-                bill_id INT PRIMARY KEY AUTO_INCREMENT,
-                reservation_id INT,
-                total_amount DECIMAL(10,2),
-                tax DECIMAL(10,2),
-                discount DECIMAL(10,2),
-                payment_method VARCHAR(20),
-                payment_status VARCHAR(20) DEFAULT 'Pending',
-                issued_date DATE,
-                FOREIGN KEY (reservation_id) REFERENCES Reservations(reservation_id)
-            )
-        """;
+        String createBillingTable = "CREATE TABLE IF NOT EXISTS Billing (" +
+            "bill_id INT PRIMARY KEY AUTO_INCREMENT," +
+            "reservation_id INT," +
+            "total_amount DECIMAL(10,2)," +
+            "tax DECIMAL(10,2)," +
+            "discount DECIMAL(10,2)," +
+            "payment_method VARCHAR(20)," +
+            "payment_status VARCHAR(20) DEFAULT 'Pending'," +
+            "issued_date DATE," +
+            "FOREIGN KEY (reservation_id) REFERENCES Reservations(reservation_id)" +
+            ")";
         
         // Create CheckInOut table
-        String createCheckInOutTable = """
-            CREATE TABLE IF NOT EXISTS CheckInOut (
-                id INT PRIMARY KEY AUTO_INCREMENT,
-                reservation_id INT,
-                check_in_time DATETIME,
-                check_out_time DATETIME,
-                FOREIGN KEY (reservation_id) REFERENCES Reservations(reservation_id)
-            )
-        """;
+        String createCheckInOutTable = "CREATE TABLE IF NOT EXISTS CheckInOut (" +
+            "id INT PRIMARY KEY AUTO_INCREMENT," +
+            "reservation_id INT," +
+            "check_in_time DATETIME," +
+            "check_out_time DATETIME," +
+            "FOREIGN KEY (reservation_id) REFERENCES Reservations(reservation_id)" +
+            ")";
         
         // Create RoomServiceItems table
-        String createRoomServiceItemsTable = """
-            CREATE TABLE IF NOT EXISTS RoomServiceItems (
-                item_id INT PRIMARY KEY AUTO_INCREMENT,
-                item_name VARCHAR(100) NOT NULL,
-                description TEXT,
-                price DECIMAL(10,2) NOT NULL,
-                category VARCHAR(50)
-            )
-        """;
+        String createRoomServiceItemsTable = "CREATE TABLE IF NOT EXISTS RoomServiceItems (" +
+            "item_id INT PRIMARY KEY AUTO_INCREMENT," +
+            "item_name VARCHAR(100) NOT NULL," +
+            "description TEXT," +
+            "price DECIMAL(10,2) NOT NULL," +
+            "category VARCHAR(50)" +
+            ")";
         
         // Create RoomServiceOrders table
-        String createRoomServiceOrdersTable = """
-            CREATE TABLE IF NOT EXISTS RoomServiceOrders (
-                order_id INT PRIMARY KEY AUTO_INCREMENT,
-                reservation_id INT,
-                order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-                delivery_status VARCHAR(20) DEFAULT 'Pending',
-                total_amount DECIMAL(10,2),
-                FOREIGN KEY (reservation_id) REFERENCES Reservations(reservation_id)
-            )
-        """;
+        String createRoomServiceOrdersTable = "CREATE TABLE IF NOT EXISTS RoomServiceOrders (" +
+            "order_id INT PRIMARY KEY AUTO_INCREMENT," +
+            "reservation_id INT," +
+            "order_date DATETIME DEFAULT CURRENT_TIMESTAMP," +
+            "delivery_status VARCHAR(20) DEFAULT 'Pending'," +
+            "total_amount DECIMAL(10,2)," +
+            "FOREIGN KEY (reservation_id) REFERENCES Reservations(reservation_id)" +
+            ")";
         
         // Create OrderDetails table
-        String createOrderDetailsTable = """
-            CREATE TABLE IF NOT EXISTS OrderDetails (
-                order_detail_id INT PRIMARY KEY AUTO_INCREMENT,
-                order_id INT,
-                item_id INT,
-                quantity INT NOT NULL,
-                unit_price DECIMAL(10,2) NOT NULL,
-                FOREIGN KEY (order_id) REFERENCES RoomServiceOrders(order_id),
-                FOREIGN KEY (item_id) REFERENCES RoomServiceItems(item_id)
-            )
-        """;
+        String createOrderDetailsTable = "CREATE TABLE IF NOT EXISTS OrderDetails (" +
+            "order_detail_id INT PRIMARY KEY AUTO_INCREMENT," +
+            "order_id INT," +
+            "item_id INT," +
+            "quantity INT NOT NULL," +
+            "unit_price DECIMAL(10,2) NOT NULL," +
+            "FOREIGN KEY (order_id) REFERENCES RoomServiceOrders(order_id)," +
+            "FOREIGN KEY (item_id) REFERENCES RoomServiceItems(item_id)" +
+            ")";
         
         // Execute table creation
         stmt.executeUpdate(createRoomsTable);
@@ -170,41 +154,35 @@ public class DatabaseConnection {
         }
         
         // Insert sample rooms
-        String insertRooms = """
-            INSERT INTO Rooms (room_number, room_type, price, status) VALUES
-            ('101', 'Single', 100.00, 'Available'),
-            ('102', 'Single', 100.00, 'Available'),
-            ('103', 'Single', 100.00, 'Maintenance'),
-            ('201', 'Double', 150.00, 'Available'),
-            ('202', 'Double', 150.00, 'Occupied'),
-            ('203', 'Double', 150.00, 'Available'),
-            ('301', 'Suite', 300.00, 'Available'),
-            ('302', 'Suite', 300.00, 'Available'),
-            ('401', 'Deluxe', 250.00, 'Available'),
-            ('402', 'Deluxe', 250.00, 'Available')
-        """;
+        String insertRooms = "INSERT INTO Rooms (room_number, room_type, price, status) VALUES " +
+            "('101', 'Single', 100.00, 'Available')," +
+            "('102', 'Single', 100.00, 'Available')," +
+            "('103', 'Single', 100.00, 'Maintenance')," +
+            "('201', 'Double', 150.00, 'Available')," +
+            "('202', 'Double', 150.00, 'Occupied')," +
+            "('203', 'Double', 150.00, 'Available')," +
+            "('301', 'Suite', 300.00, 'Available')," +
+            "('302', 'Suite', 300.00, 'Available')," +
+            "('401', 'Deluxe', 250.00, 'Available')," +
+            "('402', 'Deluxe', 250.00, 'Available')";
         
         // Insert sample guests
-        String insertGuests = """
-            INSERT INTO Guests (full_name, phone, id_passport, address) VALUES
-            ('John Doe', '+1-555-0101', 'P123456789', '123 Main St, New York, NY'),
-            ('Jane Smith', '+1-555-0102', 'DL987654321', '456 Oak Ave, Los Angeles, CA'),
-            ('Robert Johnson', '+1-555-0103', 'ID456789123', '789 Pine Rd, Chicago, IL'),
-            ('Emily Davis', '+44-20-7946-0958', 'P987654321', '10 Downing St, London, UK'),
-            ('Michael Wilson', '+1-555-0105', 'P111222333', '321 Elm St, Miami, FL')
-        """;
+        String insertGuests = "INSERT INTO Guests (full_name, phone, id_passport, address) VALUES " +
+            "('John Doe', '+1-555-0101', 'P123456789', '123 Main St, New York, NY')," +
+            "('Jane Smith', '+1-555-0102', 'DL987654321', '456 Oak Ave, Los Angeles, CA')," +
+            "('Robert Johnson', '+1-555-0103', 'ID456789123', '789 Pine Rd, Chicago, IL')," +
+            "('Emily Davis', '+44-20-7946-0958', 'P987654321', '10 Downing St, London, UK')," +
+            "('Michael Wilson', '+1-555-0105', 'P111222333', '321 Elm St, Miami, FL')";
         
         // Insert sample room service items
-        String insertRoomServiceItems = """
-            INSERT INTO RoomServiceItems (item_name, description, price, category) VALUES
-            ('Club Sandwich', 'Triple-decker sandwich with turkey, bacon, lettuce, tomato', 15.99, 'Food'),
-            ('Caesar Salad', 'Fresh romaine lettuce with caesar dressing and croutons', 12.99, 'Food'),
-            ('Grilled Salmon', 'Atlantic salmon with lemon butter sauce', 24.99, 'Food'),
-            ('Coffee', 'Freshly brewed coffee', 4.99, 'Beverage'),
-            ('Orange Juice', 'Fresh squeezed orange juice', 6.99, 'Beverage'),
-            ('Laundry Service', 'Same-day laundry service', 25.00, 'Laundry'),
-            ('Room Cleaning', 'Additional room cleaning service', 30.00, 'Service')
-        """;
+        String insertRoomServiceItems = "INSERT INTO RoomServiceItems (item_name, description, price, category) VALUES " +
+            "('Club Sandwich', 'Triple-decker sandwich with turkey, bacon, lettuce, tomato', 15.99, 'Food')," +
+            "('Caesar Salad', 'Fresh romaine lettuce with caesar dressing and croutons', 12.99, 'Food')," +
+            "('Grilled Salmon', 'Atlantic salmon with lemon butter sauce', 24.99, 'Food')," +
+            "('Coffee', 'Freshly brewed coffee', 4.99, 'Beverage')," +
+            "('Orange Juice', 'Fresh squeezed orange juice', 6.99, 'Beverage')," +
+            "('Laundry Service', 'Same-day laundry service', 25.00, 'Laundry')," +
+            "('Room Cleaning', 'Additional room cleaning service', 30.00, 'Service')";
         
         stmt.executeUpdate(insertRooms);
         stmt.executeUpdate(insertGuests);

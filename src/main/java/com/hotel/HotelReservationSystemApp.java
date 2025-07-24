@@ -109,17 +109,13 @@ public class HotelReservationSystemApp {
     }
     
     private static void showDatabaseErrorDialog() {
-        String message = """
-            Database Connection Failed!
-            
-            Please ensure:
-            1. MySQL server is running
-            2. Database 'hotel_db' exists or can be created
-            3. Username and password are correct
-            4. MySQL Connector J 9.3.0 is in classpath
-            
-            Check DatabaseConnection.java for configuration.
-            """;
+        String message = "Database Connection Failed!\n\n" +
+            "Please ensure:\n" +
+            "1. MySQL server is running\n" +
+            "2. Database 'hotel_db' exists or can be created\n" +
+            "3. Username and password are correct\n" +
+            "4. MySQL Connector J 9.3.0 is in classpath\n\n" +
+            "Check DatabaseConnection.java for configuration.";
         
         JOptionPane.showMessageDialog(null, message, "Database Error", JOptionPane.ERROR_MESSAGE);
         System.exit(1);

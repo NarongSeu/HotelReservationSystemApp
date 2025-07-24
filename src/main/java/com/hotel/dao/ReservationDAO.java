@@ -11,13 +11,11 @@ public class ReservationDAO {
     
     public List<Reservation> getAllReservations() {
         List<Reservation> reservations = new ArrayList<>();
-        String sql = """
-            SELECT r.*, g.full_name, rm.room_number 
-            FROM Reservations r 
-            JOIN Guests g ON r.guest_id = g.guest_id 
-            JOIN Rooms rm ON r.room_id = rm.room_id 
-            ORDER BY r.check_in_date DESC
-        """;
+        String sql = "SELECT r.*, g.full_name, rm.room_number " +
+            "FROM Reservations r " +
+            "JOIN Guests g ON r.guest_id = g.guest_id " +
+            "JOIN Rooms rm ON r.room_id = rm.room_id " +
+            "ORDER BY r.check_in_date DESC";
         
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
