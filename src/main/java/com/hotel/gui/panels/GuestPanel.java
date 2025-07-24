@@ -4,35 +4,11 @@ import com.hotel.dao.GuestDAO;
 import com.hotel.model.Guest;
 import com.hotel.gui.components.ModernTable;
 import com.hotel.gui.components.ModernFormPanel;
+import com.hotel.gui.components.RoundedPanel;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
-import java.awt.geom.RoundRectangle2D;
-
-class RoundedPanel extends JPanel {
-    private int cornerRadius;
-    private Color backgroundColor;
-
-    public RoundedPanel(int cornerRadius, Color backgroundColor) {
-        this.cornerRadius = cornerRadius;
-        this.backgroundColor = backgroundColor;
-        setOpaque(false); // Important: Make the panel transparent
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g.create();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        // Paint the background with rounded corners
-        g2.setColor(backgroundColor);
-        g2.fillRoundRect(0, 0, getWidth(), getHeight(), cornerRadius, cornerRadius);
-
-        g2.dispose();
-        super.paintComponent(g);
-    }
-}
 
 public class GuestPanel extends JPanel {
     private ModernTable guestTable;
