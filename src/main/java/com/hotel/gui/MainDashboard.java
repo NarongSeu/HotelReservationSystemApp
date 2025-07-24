@@ -6,6 +6,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.net.URL;
+import javax.imageio.ImageIO;
 
 public class MainDashboard extends JFrame {
     private JPanel contentPanel;
@@ -94,8 +97,12 @@ public class MainDashboard extends JFrame {
         JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         userPanel.setOpaque(false);
         
-        JLabel userIcon = new JLabel("●");
-        userIcon.setFont(new Font("Arial", Font.PLAIN, 16));
+        // Create admin icon
+        JLabel userIcon = createIconLabel("https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-A0tiVGYoXG3nwJKk8iYa73au2YpePf.png", 16, 16);
+        if (userIcon == null) {
+            userIcon = new JLabel("●");
+            userIcon.setFont(new Font("Arial", Font.PLAIN, 16));
+        }
         userIcon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
         
         JLabel userLabel = new JLabel("Admin User");
@@ -112,7 +119,7 @@ public class MainDashboard extends JFrame {
     private JPanel createModernNavigationPanel() {
         GradientPanel navPanel = new GradientPanel(new Color(45, 55, 130), new Color(25, 35, 80));
         navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.Y_AXIS));
-        navPanel.setPreferredSize(new Dimension(280, 0)); // Increased width to prevent cutting
+        navPanel.setPreferredSize(new Dimension(280, 0));
         navPanel.setBorder(BorderFactory.createEmptyBorder(30, 25, 30, 25));
         
         // Hotel logo/title - perfectly centered
@@ -122,9 +129,13 @@ public class MainDashboard extends JFrame {
         logoPanel.setMaximumSize(new Dimension(280, 60));
         logoPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
         
-        JLabel logoIcon = new JLabel("■");
-        logoIcon.setFont(new Font("Arial", Font.BOLD, 18));
-        logoIcon.setForeground(Color.WHITE);
+        // Create hotel icon
+        JLabel logoIcon = createIconLabel("https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-do0X0WL8dWZTNuH7kz03ambfepTL3d.png", 20, 20);
+        if (logoIcon == null) {
+            logoIcon = new JLabel("■");
+            logoIcon.setFont(new Font("Arial", Font.BOLD, 18));
+            logoIcon.setForeground(Color.WHITE);
+        }
         logoIcon.setPreferredSize(new Dimension(25, 25));
         logoIcon.setHorizontalAlignment(SwingConstants.CENTER);
         
@@ -138,12 +149,18 @@ public class MainDashboard extends JFrame {
         navPanel.add(logoPanel);
         navPanel.add(Box.createRigidArea(new Dimension(0, 50)));
         
-        // Navigation buttons with perfect alignment
+        // Navigation buttons with icons
         String[] buttonNames = {"Dashboard", "Rooms", "Guests", "Reservations", "Billing"};
-        String[] buttonIcons = {"■", "| |", "●", "≡", "$"};
+        String[] iconUrls = {
+            "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-FBEBG7E1OhWPTL9TseV4zfPWNsnaX9.png",  // Dashboard - laptop with chart
+            "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-2WEhHYngxG8FBtU2JjGYEpNijkVGED.png",  // Rooms - building structure
+            "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-E15rmZgH5dmpt4jpn3GxoiWUCVVgR4.png",  // Guests - person silhouette
+            "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-MvXvMqzcddpVe1rLXlXEe71hCqMInS.png",  // Reservations - calendar/booking
+            "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-3cjnDOji2uQ0U4UUpauQOKw0bAiNL7.png"   // Billing - receipt with dollar
+        };
         
         for (int i = 0; i < buttonNames.length; i++) {
-            JButton button = createPerfectNavButton(buttonNames[i], buttonIcons[i]);
+            JButton button = createIconNavButton(buttonNames[i], iconUrls[i]);
             
             JPanel buttonContainer = new JPanel();
             buttonContainer.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -160,7 +177,7 @@ public class MainDashboard extends JFrame {
         navPanel.add(Box.createVerticalGlue());
         
         // Logout button at bottom
-        JButton logoutButton = createPerfectNavButton("Logout", "◐");
+        JButton logoutButton = createIconNavButton("Logout", "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-7d6aFSU1iqFb2E2Gy1fZY4fIpGdhgh.png");
         JPanel logoutContainer = new JPanel();
         logoutContainer.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         logoutContainer.setOpaque(false);
@@ -174,7 +191,33 @@ public class MainDashboard extends JFrame {
         return navPanel;
     }
     
-    private JButton createPerfectNavButton(String text, String icon) {
+    private JLabel createIconLabel(String iconUrl, int width, int height) {
+        try {
+            URL url = new URL(iconUrl);
+            BufferedImage originalImage = ImageIO.read(url);
+            
+            // Create white version of the icon for navigation
+            BufferedImage whiteImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = whiteImage.createGraphics();
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            
+            // Scale and draw the original image
+            g2d.drawImage(originalImage.getScaledInstance(width, height, Image.SCALE_SMOOTH), 0, 0, null);
+            
+            // Apply white color filter
+            g2d.setComposite(AlphaComposite.SrcAtop);
+            g2d.setColor(Color.WHITE);
+            g2d.fillRect(0, 0, width, height);
+            g2d.dispose();
+            
+            return new JLabel(new ImageIcon(whiteImage));
+        } catch (Exception e) {
+            System.err.println("Could not load icon from: " + iconUrl);
+            return null;
+        }
+    }
+    
+    private JButton createIconNavButton(String text, String iconUrl) {
         JButton button = new JButton();
         button.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         button.setPreferredSize(new Dimension(220, 45));
@@ -192,9 +235,13 @@ public class MainDashboard extends JFrame {
         content.setOpaque(false);
         
         // Icon with fixed width for perfect alignment
-        JLabel iconLabel = new JLabel(icon);
-        iconLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        iconLabel.setForeground(Color.WHITE);
+        JLabel iconLabel = createIconLabel(iconUrl, 18, 18);
+        if (iconLabel == null) {
+            // Fallback to text icon
+            iconLabel = new JLabel("●");
+            iconLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+            iconLabel.setForeground(Color.WHITE);
+        }
         iconLabel.setPreferredSize(new Dimension(25, 20));
         iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
         
