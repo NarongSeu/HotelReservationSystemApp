@@ -116,8 +116,8 @@ public class MainDashboard extends JFrame {
         navPanel.setPreferredSize(new Dimension(250, 0));
         navPanel.setBorder(BorderFactory.createEmptyBorder(30, 20, 30, 20));
         
-        // Hotel logo/title - exactly like reference
-        JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        // Hotel logo/title - centered
+        JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         logoPanel.setOpaque(false);
         logoPanel.setMaximumSize(new Dimension(250, 60));
         
@@ -133,31 +133,41 @@ public class MainDashboard extends JFrame {
         navPanel.add(logoPanel);
         navPanel.add(Box.createRigidArea(new Dimension(0, 40)));
         
-        // Navigation buttons - exactly like reference
+        // Navigation buttons - centered
         String[] buttonNames = {"Dashboard", "Rooms", "Guests", "Reservations", "Billing"};
         String[] buttonIcons = {"📊", "🏠", "👥", "📅", "💰"};
         
         for (int i = 0; i < buttonNames.length; i++) {
+            JPanel buttonWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+            buttonWrapper.setOpaque(false);
+            buttonWrapper.setMaximumSize(new Dimension(250, 45));
+            
             JButton button = createModernNavButton(buttonNames[i], buttonIcons[i]);
-            navPanel.add(button);
+            buttonWrapper.add(button);
+            
+            navPanel.add(buttonWrapper);
             navPanel.add(Box.createRigidArea(new Dimension(0, 8)));
         }
         
         // Add flexible space
         navPanel.add(Box.createVerticalGlue());
         
-        // Logout button
+        // Logout button - centered
+        JPanel logoutWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        logoutWrapper.setOpaque(false);
+        logoutWrapper.setMaximumSize(new Dimension(250, 45));
+        
         JButton logoutButton = createModernNavButton("Logout", "🚪");
-        navPanel.add(logoutButton);
+        logoutWrapper.add(logoutButton);
+        navPanel.add(logoutWrapper);
         
         return navPanel;
     }
     
     private JButton createModernNavButton(String text, String icon) {
         JButton button = new JButton();
-        button.setLayout(new BorderLayout());
-        button.setMaximumSize(new Dimension(210, 45));
-        button.setPreferredSize(new Dimension(210, 45));
+        button.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 12));
+        button.setPreferredSize(new Dimension(180, 45));
         button.setBackground(new Color(255, 255, 255, 0));
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
@@ -166,18 +176,22 @@ public class MainDashboard extends JFrame {
         button.setFont(new Font("Arial", Font.PLAIN, 14));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
+        // Create content panel
+        JPanel contentPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        contentPanel.setOpaque(false);
+        
         // Icon label
         JLabel iconLabel = new JLabel(icon);
         iconLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        iconLabel.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 10));
         
         // Text label
         JLabel textLabel = new JLabel(text);
         textLabel.setForeground(Color.WHITE);
         textLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         
-        button.add(iconLabel, BorderLayout.WEST);
-        button.add(textLabel, BorderLayout.CENTER);
+        contentPanel.add(iconLabel);
+        contentPanel.add(textLabel);
+        button.add(contentPanel);
         
         button.addActionListener(new ActionListener() {
             @Override

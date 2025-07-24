@@ -75,63 +75,117 @@ public class ReservationPanel extends JPanel {
     
     private void setupLayout() {
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+        setBackground(new Color(248, 250, 252)); // Match main background
         
+        // Title with better spacing
         JLabel titleLabel = new JLabel("Reservation Management");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
+        titleLabel.setForeground(new Color(55, 65, 81));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 25, 0));
         add(titleLabel, BorderLayout.NORTH);
         
-        JScrollPane scrollPane = new JScrollPane(reservationTable);
-        add(scrollPane, BorderLayout.CENTER);
+        // Main content with proper spacing
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setOpaque(false);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         
-        JPanel bottomPanel = createBottomPanel();
-        add(bottomPanel, BorderLayout.SOUTH);
+        // Table panel with rounded corners
+        RoundedPanel tablePanel = new RoundedPanel(12, Color.WHITE);
+        tablePanel.setLayout(new BorderLayout());
+        tablePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        JScrollPane scrollPane = new JScrollPane(reservationTable);
+        scrollPane.setBorder(null);
+        scrollPane.getViewport().setBackground(Color.WHITE);
+        scrollPane.setOpaque(false);
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
+        
+        mainPanel.add(tablePanel, BorderLayout.CENTER);
+        
+        // Form panel
+        JPanel formPanel = createFormPanel();
+        mainPanel.add(formPanel, BorderLayout.SOUTH);
+        
+        add(mainPanel, BorderLayout.CENTER);
     }
     
     private JPanel createBottomPanel() {
-        JPanel bottomPanel = new JPanel(new BorderLayout());
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
+        return createFormPanel();
+    }
+
+    private JPanel createFormPanel() {
+        ModernFormPanel formPanel = new ModernFormPanel("Reservation Details");
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
         
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBorder(BorderFactory.createTitledBorder("Reservation Details"));
+        JPanel fieldsPanel = new JPanel(new GridBagLayout());
+        fieldsPanel.setOpaque(false);
+        fieldsPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(12, 12, 12, 12);
         
-        gbc.gridx = 0; gbc.gridy = 0;
-        formPanel.add(new JLabel("Guest:"), gbc);
-        gbc.gridx = 1;
-        formPanel.add(guestComboBox, gbc);
+        // Row 1 - Guest and Room
+        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.EAST;
+        fieldsPanel.add(createFieldLabel("Guest:"), gbc);
+        gbc.gridx = 1; gbc.anchor = GridBagConstraints.WEST;
+        guestComboBox.setPreferredSize(new Dimension(250, 35));
+        fieldsPanel.add(guestComboBox, gbc);
         
-        gbc.gridx = 2; gbc.gridy = 0;
-        formPanel.add(new JLabel("Room:"), gbc);
-        gbc.gridx = 3;
-        formPanel.add(roomComboBox, gbc);
+        gbc.gridx = 2; gbc.anchor = GridBagConstraints.EAST;
+        fieldsPanel.add(createFieldLabel("Room:"), gbc);
+        gbc.gridx = 3; gbc.anchor = GridBagConstraints.WEST;
+        roomComboBox.setPreferredSize(new Dimension(250, 35));
+        fieldsPanel.add(roomComboBox, gbc);
         
-        gbc.gridx = 0; gbc.gridy = 1;
-        formPanel.add(new JLabel("Check-In (YYYY-MM-DD):"), gbc);
-        gbc.gridx = 1;
-        formPanel.add(checkInField, gbc);
+        // Row 2 - Check-in and Check-out dates
+        gbc.gridx = 0; gbc.gridy = 1; gbc.anchor = GridBagConstraints.EAST;
+        fieldsPanel.add(createFieldLabel("Check-In (YYYY-MM-DD):"), gbc);
+        gbc.gridx = 1; gbc.anchor = GridBagConstraints.WEST;
+        checkInField.setPreferredSize(new Dimension(250, 35));
+        fieldsPanel.add(checkInField, gbc);
         
-        gbc.gridx = 2; gbc.gridy = 1;
-        formPanel.add(new JLabel("Check-Out (YYYY-MM-DD):"), gbc);
-        gbc.gridx = 3;
-        formPanel.add(checkOutField, gbc);
+        gbc.gridx = 2; gbc.anchor = GridBagConstraints.EAST;
+        fieldsPanel.add(createFieldLabel("Check-Out (YYYY-MM-DD):"), gbc);
+        gbc.gridx = 3; gbc.anchor = GridBagConstraints.WEST;
+        checkOutField.setPreferredSize(new Dimension(250, 35));
+        fieldsPanel.add(checkOutField, gbc);
         
-        gbc.gridx = 0; gbc.gridy = 2;
-        formPanel.add(new JLabel("Status:"), gbc);
-        gbc.gridx = 1;
-        formPanel.add(statusComboBox, gbc);
+        // Row 3 - Status (centered)
+        gbc.gridx = 1; gbc.gridy = 2; gbc.anchor = GridBagConstraints.EAST;
+        fieldsPanel.add(createFieldLabel("Status:"), gbc);
+        gbc.gridx = 2; gbc.anchor = GridBagConstraints.WEST;
+        statusComboBox.setPreferredSize(new Dimension(250, 35));
+        fieldsPanel.add(statusComboBox, gbc);
         
-        bottomPanel.add(formPanel, BorderLayout.CENTER);
+        formPanel.add(fieldsPanel, BorderLayout.CENTER);
         
-        JPanel buttonPanel = new JPanel(new FlowLayout());
-        JButton addButton = new JButton("Add Reservation");
-        JButton updateButton = new JButton("Update Reservation");
-        JButton deleteButton = new JButton("Delete Reservation");
-        JButton checkInButton = new JButton("Check In");
-        JButton checkOutButton = new JButton("Check Out");
-        JButton clearButton = new JButton("Clear");
+        // Enhanced buttons with better spacing
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 20));
+        buttonPanel.setOpaque(false);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        
+        JButton addButton = ModernFormPanel.createModernButton("Add Reservation", new Color(34, 197, 94));
+        JButton updateButton = ModernFormPanel.createModernButton("Update Reservation", new Color(59, 130, 246));
+        JButton deleteButton = ModernFormPanel.createModernButton("Delete Reservation", new Color(239, 68, 68));
+        JButton checkInButton = ModernFormPanel.createModernButton("Check In", new Color(168, 85, 247));
+        JButton checkOutButton = ModernFormPanel.createModernButton("Check Out", new Color(245, 158, 11));
+        JButton clearButton = ModernFormPanel.createModernButton("Clear", new Color(107, 114, 128));
+        
+        // Set consistent button sizes
+        Dimension buttonSize = new Dimension(140, 40);
+        addButton.setPreferredSize(buttonSize);
+        updateButton.setPreferredSize(buttonSize);
+        deleteButton.setPreferredSize(buttonSize);
+        checkInButton.setPreferredSize(buttonSize);
+        checkOutButton.setPreferredSize(buttonSize);
+        clearButton.setPreferredSize(buttonSize);
+        
+        buttonPanel.add(addButton);
+        buttonPanel.add(updateButton);
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(checkInButton);
+        buttonPanel.add(checkOutButton);
+        buttonPanel.add(clearButton);
         
         addButton.addActionListener(e -> addReservation());
         updateButton.addActionListener(e -> updateReservation());
@@ -146,16 +200,16 @@ public class ReservationPanel extends JPanel {
             }
         });
         
-        buttonPanel.add(addButton);
-        buttonPanel.add(updateButton);
-        buttonPanel.add(deleteButton);
-        buttonPanel.add(checkInButton);
-        buttonPanel.add(checkOutButton);
-        buttonPanel.add(clearButton);
+        formPanel.add(buttonPanel, BorderLayout.SOUTH);
         
-        bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
-        
-        return bottomPanel;
+        return formPanel;
+    }
+    
+    private JLabel createFieldLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Arial", Font.BOLD, 13));
+        label.setForeground(new Color(55, 65, 81));
+        return label;
     }
     
     private void addReservation() {
