@@ -2,13 +2,15 @@ package com.hotel.gui.panels;
 
 import com.hotel.dao.GuestDAO;
 import com.hotel.model.Guest;
+import com.hotel.gui.components.ModernTable;
+import com.hotel.gui.components.ModernFormPanel;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
 public class GuestPanel extends JPanel {
-    private JTable guestTable;
+    private ModernTable guestTable;
     private DefaultTableModel tableModel;
     private GuestDAO guestDAO;
     private JTextField nameField, phoneField, idField;
@@ -22,6 +24,9 @@ public class GuestPanel extends JPanel {
     }
     
     private void initializeComponents() {
+        setBackground(new Color(243, 244, 246)); // Light gray background like reference
+        
+        // Table setup - exactly like reference
         String[] columnNames = {"ID", "Full Name", "Phone", "ID/Passport", "Address"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
@@ -29,68 +34,103 @@ public class GuestPanel extends JPanel {
                 return false;
             }
         };
-        guestTable = new JTable(tableModel);
+        guestTable = new ModernTable(tableModel);
         
-        nameField = new JTextField(20);
-        phoneField = new JTextField(20);
-        idField = new JTextField(20);
+        // Form fields
+        nameField = ModernFormPanel.createModernTextField();
+        phoneField = ModernFormPanel.createModernTextField();
+        idField = ModernFormPanel.createModernTextField();
         addressArea = new JTextArea(3, 20);
         addressArea.setLineWrap(true);
         addressArea.setWrapStyleWord(true);
+        addressArea.setFont(new Font("Arial", Font.PLAIN, 13));
+        addressArea.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(209, 213, 219), 1),
+            BorderFactory.createEmptyBorder(8, 12, 8, 12)
+        ));
     }
     
     private void setupLayout() {
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
         
+        // Title - exactly like reference
         JLabel titleLabel = new JLabel("Guest Management");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
+        titleLabel.setForeground(new Color(55, 65, 81));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 25, 0));
         add(titleLabel, BorderLayout.NORTH);
         
-        JScrollPane scrollPane = new JScrollPane(guestTable);
-        add(scrollPane, BorderLayout.CENTER);
+        // Main content
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setOpaque(false);
         
-        JPanel bottomPanel = createBottomPanel();
-        add(bottomPanel, BorderLayout.SOUTH);
+        // Table panel - clean white background like reference
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        tablePanel.setBackground(Color.WHITE);
+        tablePanel.setBorder(BorderFactory.createLineBorder(new Color(229, 231, 235), 1));
+        
+        JScrollPane scrollPane = new JScrollPane(guestTable);
+        scrollPane.setBorder(null);
+        scrollPane.getViewport().setBackground(Color.WHITE);
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
+        
+        mainPanel.add(tablePanel, BorderLayout.CENTER);
+        
+        // Form panel
+        JPanel formPanel = createFormPanel();
+        mainPanel.add(formPanel, BorderLayout.SOUTH);
+        
+        add(mainPanel, BorderLayout.CENTER);
     }
     
-    private JPanel createBottomPanel() {
-        JPanel bottomPanel = new JPanel(new BorderLayout());
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
+    private JPanel createFormPanel() {
+        ModernFormPanel formPanel = new ModernFormPanel("Guest Details");
+        formPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createEmptyBorder(20, 0, 0, 0),
+            BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(229, 231, 235), 1),
+                BorderFactory.createEmptyBorder(20, 20, 20, 20)
+            )
+        ));
         
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBorder(BorderFactory.createTitledBorder("Guest Details"));
+        JPanel fieldsPanel = new JPanel(new GridBagLayout());
+        fieldsPanel.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(8, 8, 8, 8);
         
+        // Row 1
         gbc.gridx = 0; gbc.gridy = 0;
-        formPanel.add(new JLabel("Full Name:"), gbc);
+        fieldsPanel.add(createFieldLabel("Full Name:"), gbc);
         gbc.gridx = 1;
-        formPanel.add(nameField, gbc);
+        fieldsPanel.add(nameField, gbc);
         
+        gbc.gridx = 2;
+        fieldsPanel.add(createFieldLabel("Phone:"), gbc);
+        gbc.gridx = 3;
+        fieldsPanel.add(phoneField, gbc);
+        
+        // Row 2
         gbc.gridx = 0; gbc.gridy = 1;
-        formPanel.add(new JLabel("Phone:"), gbc);
+        fieldsPanel.add(createFieldLabel("ID/Passport:"), gbc);
         gbc.gridx = 1;
-        formPanel.add(phoneField, gbc);
+        fieldsPanel.add(idField, gbc);
         
-        gbc.gridx = 0; gbc.gridy = 2;
-        formPanel.add(new JLabel("ID/Passport:"), gbc);
-        gbc.gridx = 1;
-        formPanel.add(idField, gbc);
+        gbc.gridx = 2;
+        fieldsPanel.add(createFieldLabel("Address:"), gbc);
+        gbc.gridx = 3;
+        fieldsPanel.add(new JScrollPane(addressArea), gbc);
         
-        gbc.gridx = 0; gbc.gridy = 3;
-        formPanel.add(new JLabel("Address:"), gbc);
-        gbc.gridx = 1;
-        formPanel.add(new JScrollPane(addressArea), gbc);
+        formPanel.add(fieldsPanel, BorderLayout.CENTER);
         
-        bottomPanel.add(formPanel, BorderLayout.CENTER);
+        // Buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
+        buttonPanel.setOpaque(false);
         
-        JPanel buttonPanel = new JPanel(new FlowLayout());
-        JButton addButton = new JButton("Add Guest");
-        JButton updateButton = new JButton("Update Guest");
-        JButton deleteButton = new JButton("Delete Guest");
-        JButton clearButton = new JButton("Clear");
+        JButton addButton = ModernFormPanel.createModernButton("Add Guest", new Color(34, 197, 94));
+        JButton updateButton = ModernFormPanel.createModernButton("Update Guest", new Color(59, 130, 246));
+        JButton deleteButton = ModernFormPanel.createModernButton("Delete Guest", new Color(239, 68, 68));
+        JButton clearButton = ModernFormPanel.createModernButton("Clear", new Color(107, 114, 128));
         
         addButton.addActionListener(e -> addGuest());
         updateButton.addActionListener(e -> updateGuest());
@@ -108,9 +148,16 @@ public class GuestPanel extends JPanel {
         buttonPanel.add(deleteButton);
         buttonPanel.add(clearButton);
         
-        bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
+        formPanel.add(buttonPanel, BorderLayout.SOUTH);
         
-        return bottomPanel;
+        return formPanel;
+    }
+    
+    private JLabel createFieldLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Arial", Font.PLAIN, 13));
+        label.setForeground(new Color(75, 85, 99));
+        return label;
     }
     
     private void addGuest() {

@@ -32,7 +32,7 @@ public class MainDashboard extends JFrame {
     private void initializeComponents() {
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
-        contentPanel.setBackground(ModernColors.MAIN_BACKGROUND);
+        contentPanel.setBackground(new Color(243, 244, 246)); // Light gray background like reference
         
         // Initialize panels
         dashboardPanel = new DashboardPanel();
@@ -56,8 +56,8 @@ public class MainDashboard extends JFrame {
         JPanel navigationPanel = createModernNavigationPanel();
         add(navigationPanel, BorderLayout.WEST);
         
-        // Create header panel
-        JPanel headerPanel = createHeaderPanel();
+        // Create simple header panel (no search bar)
+        JPanel headerPanel = createSimpleHeaderPanel();
         add(headerPanel, BorderLayout.NORTH);
         
         add(contentPanel, BorderLayout.CENTER);
@@ -66,34 +66,19 @@ public class MainDashboard extends JFrame {
         cardLayout.show(contentPanel, "Dashboard");
     }
     
-    private JPanel createHeaderPanel() {
+    private JPanel createSimpleHeaderPanel() {
         JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(ModernColors.CARD_BACKGROUND);
+        headerPanel.setBackground(new Color(243, 244, 246)); // Match reference background
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 30, 15, 30));
-        headerPanel.setPreferredSize(new Dimension(0, 70));
+        headerPanel.setPreferredSize(new Dimension(0, 60));
         
-        // Search panel
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        searchPanel.setOpaque(false);
-        
-        JTextField searchField = new JTextField("Search...", 20);
-        searchField.setFont(new Font("Arial", Font.PLAIN, 14));
-        searchField.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
-            BorderFactory.createEmptyBorder(8, 12, 8, 12)
-        ));
-        searchField.setBackground(ModernColors.MAIN_BACKGROUND);
-        
-        searchPanel.add(searchField);
-        headerPanel.add(searchPanel, BorderLayout.WEST);
-        
-        // User info panel
+        // Only show "Admin User" on the right - no search bar
         JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         userPanel.setOpaque(false);
         
         JLabel userLabel = new JLabel("Admin User");
         userLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        userLabel.setForeground(ModernColors.TEXT_PRIMARY);
+        userLabel.setForeground(new Color(55, 65, 81));
         
         userPanel.add(userLabel);
         headerPanel.add(userPanel, BorderLayout.EAST);
@@ -102,12 +87,12 @@ public class MainDashboard extends JFrame {
     }
     
     private JPanel createModernNavigationPanel() {
-        GradientPanel navPanel = new GradientPanel(ModernColors.SIDEBAR_START, ModernColors.SIDEBAR_END);
+        GradientPanel navPanel = new GradientPanel(new Color(45, 55, 130), new Color(25, 35, 80));
         navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.Y_AXIS));
         navPanel.setPreferredSize(new Dimension(250, 0));
         navPanel.setBorder(BorderFactory.createEmptyBorder(30, 20, 30, 20));
         
-        // Hotel logo/title
+        // Hotel logo/title - exactly like reference
         JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         logoPanel.setOpaque(false);
         logoPanel.setMaximumSize(new Dimension(250, 60));
@@ -116,7 +101,7 @@ public class MainDashboard extends JFrame {
         logoIcon.setFont(new Font("Arial", Font.BOLD, 24));
         
         JLabel titleLabel = new JLabel("Hotel System");
-        titleLabel.setForeground(ModernColors.TEXT_WHITE);
+        titleLabel.setForeground(Color.WHITE);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         
         logoPanel.add(logoIcon);
@@ -124,7 +109,7 @@ public class MainDashboard extends JFrame {
         navPanel.add(logoPanel);
         navPanel.add(Box.createRigidArea(new Dimension(0, 40)));
         
-        // Navigation buttons
+        // Navigation buttons - exactly like reference
         String[] buttonNames = {"Dashboard", "Rooms", "Guests", "Reservations", "Billing"};
         String[] buttonIcons = {"📊", "🏠", "👥", "📅", "💰"};
         
@@ -150,7 +135,7 @@ public class MainDashboard extends JFrame {
         button.setMaximumSize(new Dimension(210, 45));
         button.setPreferredSize(new Dimension(210, 45));
         button.setBackground(new Color(255, 255, 255, 0));
-        button.setForeground(ModernColors.TEXT_WHITE);
+        button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setContentAreaFilled(false);
@@ -164,7 +149,7 @@ public class MainDashboard extends JFrame {
         
         // Text label
         JLabel textLabel = new JLabel(text);
-        textLabel.setForeground(ModernColors.TEXT_WHITE);
+        textLabel.setForeground(Color.WHITE);
         textLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         
         button.add(iconLabel, BorderLayout.WEST);
@@ -205,7 +190,7 @@ public class MainDashboard extends JFrame {
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(ModernColors.SIDEBAR_HOVER);
+                button.setBackground(new Color(55, 65, 140));
                 button.setOpaque(true);
                 button.repaint();
             }

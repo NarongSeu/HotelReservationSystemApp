@@ -15,110 +15,58 @@ public class ModernTable extends JTable {
     }
     
     private void setupModernStyling() {
-        // Table styling - exactly like the reference
-        setRowHeight(45);
+        // Table styling - exactly like reference (clean and minimal)
+        setRowHeight(40);
         setShowGrid(true);
-        setGridColor(new Color(226, 232, 240)); // Light gray grid lines
+        setGridColor(new Color(229, 231, 235)); // Very light gray grid
         setIntercellSpacing(new Dimension(1, 1));
-        setSelectionBackground(new Color(59, 130, 246, 30));
-        setSelectionForeground(ModernColors.TEXT_PRIMARY);
+        setSelectionBackground(new Color(239, 246, 255)); // Very light blue selection
+        setSelectionForeground(new Color(55, 65, 81));
         setBackground(Color.WHITE);
         setFont(new Font("Arial", Font.PLAIN, 13));
         
         // Header styling - exactly matching reference
         JTableHeader header = getTableHeader();
-        header.setBackground(new Color(249, 250, 251)); // Very light gray
-        header.setForeground(new Color(75, 85, 99)); // Dark gray text
+        header.setBackground(Color.WHITE);
+        header.setForeground(new Color(55, 65, 81)); // Dark text
         header.setFont(new Font("Arial", Font.BOLD, 13));
-        header.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(226, 232, 240)));
-        header.setPreferredSize(new Dimension(header.getPreferredSize().width, 45));
+        header.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(229, 231, 235)));
+        header.setPreferredSize(new Dimension(header.getPreferredSize().width, 40));
         header.setReorderingAllowed(false);
         
-        // Custom header renderer
+        // Custom header renderer - clean and simple
         header.setDefaultRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
                     boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                c.setBackground(new Color(249, 250, 251));
-                c.setForeground(new Color(75, 85, 99));
+                c.setBackground(Color.WHITE);
+                c.setForeground(new Color(55, 65, 81));
                 setFont(new Font("Arial", Font.BOLD, 13));
-                setBorder(BorderFactory.createEmptyBorder(12, 15, 12, 15));
+                setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
                 setHorizontalAlignment(SwingConstants.LEFT);
                 return c;
             }
         });
         
-        // Cell renderer for clean alternating rows
+        // Cell renderer - clean and minimal like reference
         setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, 
                     boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 
+                // Clean white background - no alternating colors
                 if (!isSelected) {
-                    if (row % 2 == 0) {
-                        c.setBackground(Color.WHITE);
-                    } else {
-                        c.setBackground(new Color(249, 250, 251)); // Very light alternating color
-                    }
+                    c.setBackground(Color.WHITE);
                 } else {
-                    c.setBackground(new Color(59, 130, 246, 30));
+                    c.setBackground(new Color(239, 246, 255));
                 }
                 
-                setBorder(BorderFactory.createEmptyBorder(12, 15, 12, 15));
-                setForeground(new Color(55, 65, 81)); // Dark gray text
+                setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+                setForeground(new Color(55, 65, 81));
                 setFont(new Font("Arial", Font.PLAIN, 13));
                 setHorizontalAlignment(SwingConstants.LEFT);
-                
-                return c;
-            }
-        });
-        
-        // Status column special renderer
-        setDefaultRenderer(String.class, new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, 
-                    boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                
-                // Apply standard styling first
-                if (!isSelected) {
-                    if (row % 2 == 0) {
-                        c.setBackground(Color.WHITE);
-                    } else {
-                        c.setBackground(new Color(249, 250, 251));
-                    }
-                } else {
-                    c.setBackground(new Color(59, 130, 246, 30));
-                }
-                
-                setBorder(BorderFactory.createEmptyBorder(12, 15, 12, 15));
-                setFont(new Font("Arial", Font.PLAIN, 13));
-                setHorizontalAlignment(SwingConstants.LEFT);
-                
-                // Special styling for status columns
-                String columnName = table.getColumnName(column);
-                if ("Status".equals(columnName) || "Payment Status".equals(columnName)) {
-                    String status = value != null ? value.toString() : "";
-                    
-                    // Create status badge
-                    if ("Available".equals(status) || "Paid".equals(status) || "Confirmed".equals(status)) {
-                        setForeground(new Color(34, 197, 94)); // Green
-                        setText("● " + status);
-                    } else if ("Occupied".equals(status) || "Pending".equals(status) || "Checked-In".equals(status)) {
-                        setForeground(new Color(251, 191, 36)); // Yellow
-                        setText("● " + status);
-                    } else if ("Maintenance".equals(status) || "Cancelled".equals(status)) {
-                        setForeground(new Color(239, 68, 68)); // Red
-                        setText("● " + status);
-                    } else {
-                        setForeground(new Color(55, 65, 81));
-                        setText(status);
-                    }
-                } else {
-                    setForeground(new Color(55, 65, 81));
-                }
                 
                 return c;
             }
