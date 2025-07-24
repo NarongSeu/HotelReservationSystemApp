@@ -56,11 +56,19 @@ public class MainDashboard extends JFrame {
         JPanel navigationPanel = createModernNavigationPanel();
         add(navigationPanel, BorderLayout.WEST);
         
-        // Create simple header panel (no search bar)
-        JPanel headerPanel = createSimpleHeaderPanel();
-        add(headerPanel, BorderLayout.NORTH);
+        // Create main content wrapper
+        JPanel mainWrapper = new JPanel(new BorderLayout());
+        mainWrapper.setBackground(new Color(248, 250, 252)); // Slightly different background
         
-        add(contentPanel, BorderLayout.CENTER);
+        // Create simple header panel
+        JPanel headerPanel = createSimpleHeaderPanel();
+        mainWrapper.add(headerPanel, BorderLayout.NORTH);
+        
+        // Content panel with proper background
+        contentPanel.setBackground(new Color(248, 250, 252));
+        mainWrapper.add(contentPanel, BorderLayout.CENTER);
+        
+        add(mainWrapper, BorderLayout.CENTER);
         
         // Show dashboard by default
         cardLayout.show(contentPanel, "Dashboard");
@@ -68,25 +76,34 @@ public class MainDashboard extends JFrame {
     
     private JPanel createSimpleHeaderPanel() {
         JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(new Color(243, 244, 246)); // Match reference background
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 30, 15, 30));
-        headerPanel.setPreferredSize(new Dimension(0, 60));
+        headerPanel.setBackground(Color.WHITE); // Clean white background
+        headerPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(229, 231, 235)), // Bottom border
+            BorderFactory.createEmptyBorder(20, 30, 20, 30) // Padding
+        ));
+        headerPanel.setPreferredSize(new Dimension(0, 70)); // Slightly taller
         
-        // Center title
+        // Center title with better styling
         JLabel titleLabel = new JLabel("Hotel Reservation System");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        titleLabel.setForeground(new Color(55, 65, 81));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setForeground(new Color(31, 41, 55)); // Darker text
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         headerPanel.add(titleLabel, BorderLayout.CENTER);
         
-        // Admin User on the right
-        JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        // Admin User section with better styling
+        JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         userPanel.setOpaque(false);
         
-        JLabel userLabel = new JLabel("Admin User");
-        userLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        userLabel.setForeground(new Color(55, 65, 81));
+        // User icon
+        JLabel userIcon = new JLabel("👤");
+        userIcon.setFont(new Font("Arial", Font.PLAIN, 16));
+        userIcon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
         
+        JLabel userLabel = new JLabel("Admin User");
+        userLabel.setFont(new Font("Arial", Font.MEDIUM, 14));
+        userLabel.setForeground(new Color(75, 85, 99));
+        
+        userPanel.add(userIcon);
         userPanel.add(userLabel);
         headerPanel.add(userPanel, BorderLayout.EAST);
         
