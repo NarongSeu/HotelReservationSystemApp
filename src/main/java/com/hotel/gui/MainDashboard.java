@@ -32,7 +32,7 @@ public class MainDashboard extends JFrame {
     private void initializeComponents() {
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
-        contentPanel.setBackground(new Color(243, 244, 246)); // Light gray background like reference
+        contentPanel.setBackground(new Color(243, 244, 246));
         
         // Initialize panels
         dashboardPanel = new DashboardPanel();
@@ -58,7 +58,7 @@ public class MainDashboard extends JFrame {
         
         // Create main content wrapper
         JPanel mainWrapper = new JPanel(new BorderLayout());
-        mainWrapper.setBackground(new Color(248, 250, 252)); // Slightly different background
+        mainWrapper.setBackground(new Color(248, 250, 252));
         
         // Create simple header panel
         JPanel headerPanel = createSimpleHeaderPanel();
@@ -76,17 +76,17 @@ public class MainDashboard extends JFrame {
     
     private JPanel createSimpleHeaderPanel() {
         JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(Color.WHITE); // Clean white background
+        headerPanel.setBackground(Color.WHITE);
         headerPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(229, 231, 235)), // Bottom border
-            BorderFactory.createEmptyBorder(20, 30, 20, 30) // Padding
+            BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(229, 231, 235)),
+            BorderFactory.createEmptyBorder(20, 30, 20, 30)
         ));
-        headerPanel.setPreferredSize(new Dimension(0, 70)); // Slightly taller
+        headerPanel.setPreferredSize(new Dimension(0, 70));
         
         // Center title with better styling
         JLabel titleLabel = new JLabel("Hotel Reservation System");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setForeground(new Color(31, 41, 55)); // Darker text
+        titleLabel.setForeground(new Color(31, 41, 55));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         headerPanel.add(titleLabel, BorderLayout.CENTER);
         
@@ -94,7 +94,6 @@ public class MainDashboard extends JFrame {
         JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         userPanel.setOpaque(false);
         
-        // User icon
         JLabel userIcon = new JLabel("●");
         userIcon.setFont(new Font("Arial", Font.PLAIN, 16));
         userIcon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
@@ -113,63 +112,73 @@ public class MainDashboard extends JFrame {
     private JPanel createModernNavigationPanel() {
         GradientPanel navPanel = new GradientPanel(new Color(45, 55, 130), new Color(25, 35, 80));
         navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.Y_AXIS));
-        navPanel.setPreferredSize(new Dimension(250, 0));
-        navPanel.setBorder(BorderFactory.createEmptyBorder(30, 20, 30, 20));
+        navPanel.setPreferredSize(new Dimension(280, 0)); // Increased width to prevent cutting
+        navPanel.setBorder(BorderFactory.createEmptyBorder(30, 25, 30, 25));
         
-        // Hotel logo/title - centered
-        JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        // Hotel logo/title - perfectly centered
+        JPanel logoPanel = new JPanel();
+        logoPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         logoPanel.setOpaque(false);
-        logoPanel.setMaximumSize(new Dimension(250, 60));
+        logoPanel.setMaximumSize(new Dimension(280, 60));
+        logoPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
         
         JLabel logoIcon = new JLabel("■");
-        logoIcon.setFont(new Font("Arial", Font.BOLD, 20));
+        logoIcon.setFont(new Font("Arial", Font.BOLD, 18));
         logoIcon.setForeground(Color.WHITE);
+        logoIcon.setPreferredSize(new Dimension(25, 25));
+        logoIcon.setHorizontalAlignment(SwingConstants.CENTER);
         
         JLabel titleLabel = new JLabel("Hotel System");
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 0));
         
         logoPanel.add(logoIcon);
-        logoPanel.add(Box.createHorizontalStrut(8));
         logoPanel.add(titleLabel);
         navPanel.add(logoPanel);
-        navPanel.add(Box.createRigidArea(new Dimension(0, 40)));
+        navPanel.add(Box.createRigidArea(new Dimension(0, 50)));
         
-        // Navigation buttons - centered with proper alignment
+        // Navigation buttons with perfect alignment
         String[] buttonNames = {"Dashboard", "Rooms", "Guests", "Reservations", "Billing"};
-        String[] buttonIcons = {"■", "▢", "●", "≡", "$"}; // Clean, consistent icons
+        String[] buttonIcons = {"■", "| |", "●", "≡", "$"};
         
         for (int i = 0; i < buttonNames.length; i++) {
-            JPanel buttonWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-            buttonWrapper.setOpaque(false);
-            buttonWrapper.setMaximumSize(new Dimension(250, 50));
+            JButton button = createPerfectNavButton(buttonNames[i], buttonIcons[i]);
             
-            JButton button = createModernNavButton(buttonNames[i], buttonIcons[i]);
-            buttonWrapper.add(button);
+            JPanel buttonContainer = new JPanel();
+            buttonContainer.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+            buttonContainer.setOpaque(false);
+            buttonContainer.setMaximumSize(new Dimension(280, 50));
+            buttonContainer.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
             
-            navPanel.add(buttonWrapper);
-            navPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+            buttonContainer.add(button);
+            navPanel.add(buttonContainer);
+            navPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         }
         
         // Add flexible space
         navPanel.add(Box.createVerticalGlue());
         
-        // Logout button - centered
-        JPanel logoutWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        logoutWrapper.setOpaque(false);
-        logoutWrapper.setMaximumSize(new Dimension(250, 50));
+        // Logout button at bottom
+        JButton logoutButton = createPerfectNavButton("Logout", "◐");
+        JPanel logoutContainer = new JPanel();
+        logoutContainer.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        logoutContainer.setOpaque(false);
+        logoutContainer.setMaximumSize(new Dimension(280, 50));
+        logoutContainer.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
         
-        JButton logoutButton = createModernNavButton("Logout", "◐");
-        logoutWrapper.add(logoutButton);
-        navPanel.add(logoutWrapper);
+        logoutContainer.add(logoutButton);
+        navPanel.add(logoutContainer);
+        navPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         
         return navPanel;
     }
     
-    private JButton createModernNavButton(String text, String icon) {
+    private JButton createPerfectNavButton(String text, String icon) {
         JButton button = new JButton();
-        button.setLayout(new BorderLayout());
-        button.setPreferredSize(new Dimension(200, 45));
+        button.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        button.setPreferredSize(new Dimension(220, 45));
+        button.setMaximumSize(new Dimension(220, 45));
         button.setBackground(new Color(255, 255, 255, 0));
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
@@ -177,27 +186,27 @@ public class MainDashboard extends JFrame {
         button.setContentAreaFilled(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // Create properly aligned content
-        JPanel buttonContent = new JPanel(new BorderLayout());
-        buttonContent.setOpaque(false);
-        buttonContent.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+        // Create content with perfect alignment
+        JPanel content = new JPanel();
+        content.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 12));
+        content.setOpaque(false);
         
-        // Icon with fixed width for alignment
+        // Icon with fixed width for perfect alignment
         JLabel iconLabel = new JLabel(icon);
         iconLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         iconLabel.setForeground(Color.WHITE);
-        iconLabel.setPreferredSize(new Dimension(20, 20));
+        iconLabel.setPreferredSize(new Dimension(25, 20));
         iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
         
-        // Text label
+        // Text label with proper spacing
         JLabel textLabel = new JLabel(text);
         textLabel.setForeground(Color.WHITE);
-        textLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        textLabel.setBorder(BorderFactory.createEmptyBorder(0, 12, 0, 0));
+        textLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        textLabel.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 0));
         
-        buttonContent.add(iconLabel, BorderLayout.WEST);
-        buttonContent.add(textLabel, BorderLayout.CENTER);
-        button.add(buttonContent, BorderLayout.CENTER);
+        content.add(iconLabel);
+        content.add(textLabel);
+        button.add(content);
         
         button.addActionListener(new ActionListener() {
             @Override
@@ -207,7 +216,6 @@ public class MainDashboard extends JFrame {
                     return;
                 }
                 
-                // Use MainDashboard.this.contentPanel to refer to the class field
                 cardLayout.show(MainDashboard.this.contentPanel, text);
                 
                 // Refresh panels when switching
@@ -231,11 +239,11 @@ public class MainDashboard extends JFrame {
             }
         });
         
-        // Hover effect
+        // Smooth hover effect
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(55, 65, 140));
+                button.setBackground(new Color(55, 65, 140, 100));
                 button.setOpaque(true);
                 button.repaint();
             }
