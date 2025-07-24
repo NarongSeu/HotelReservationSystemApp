@@ -4,18 +4,15 @@ import com.hotel.gui.ModernColors;
 import javax.swing.*;
 import java.awt.*;
 
-public class ModernFormPanel extends JPanel {
+public class ModernFormPanel extends RoundedPanel {
     
     public ModernFormPanel(String title) {
+        super(12); // 12px corner radius
         setupStyling(title);
     }
     
     private void setupStyling(String title) {
-        setBackground(Color.WHITE);
-        setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
-            BorderFactory.createEmptyBorder(20, 20, 20, 20)
-        ));
+        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         setLayout(new BorderLayout());
         
         // Title
@@ -27,13 +24,30 @@ public class ModernFormPanel extends JPanel {
     }
     
     public static JTextField createModernTextField() {
-        JTextField field = new JTextField();
+        JTextField field = new JTextField() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Paint rounded background
+                g2d.setColor(getBackground());
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                
+                // Paint border
+                g2d.setColor(new Color(209, 213, 219));
+                g2d.setStroke(new BasicStroke(1));
+                g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
+                
+                g2d.dispose();
+                super.paintComponent(g);
+            }
+        };
+        
         field.setFont(new Font("Arial", Font.PLAIN, 13));
-        field.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(209, 213, 219), 1),
-            BorderFactory.createEmptyBorder(8, 12, 8, 12)
-        ));
+        field.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         field.setPreferredSize(new Dimension(200, 35));
+        field.setOpaque(false);
         return field;
     }
     
@@ -47,27 +61,31 @@ public class ModernFormPanel extends JPanel {
     }
     
     public static JButton createModernButton(String text, Color color) {
-        JButton button = new JButton(text);
+        JButton button = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                Color currentColor = getModel().isPressed() ? color.darker() : 
+                                   getModel().isRollover() ? color.brighter() : color;
+                
+                g2d.setColor(currentColor);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                
+                g2d.dispose();
+                super.paintComponent(g);
+            }
+        };
+        
         button.setFont(new Font("Arial", Font.BOLD, 12));
         button.setForeground(Color.WHITE);
-        button.setBackground(color);
         button.setFocusPainted(false);
         button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
+        button.setOpaque(false);
         button.setPreferredSize(new Dimension(120, 35));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
-        // Hover effect
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(color.brighter());
-            }
-            
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(color);
-            }
-        });
         
         return button;
     }

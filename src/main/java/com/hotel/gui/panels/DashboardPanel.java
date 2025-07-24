@@ -110,25 +110,67 @@ public class DashboardPanel extends JPanel {
     }
     
     private JButton createQuickActionButton(String text, String icon, Color color) {
-        JButton button = new JButton("<html><center>" + icon + "<br>" + text + "</center></html>");
+        JButton button = new JButton("<html><center>" + icon + "<br>" + text + "</center></html>") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                Color currentColor = getModel().isPressed() ? color.darker() : 
+                                   getModel().isRollover() ? color.brighter() : color;
+                
+                g2d.setColor(currentColor);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                
+                g2d.dispose();
+                super.paintComponent(g);
+            }
+        };
+        
         button.setPreferredSize(new Dimension(120, 80));
-        button.setBackground(color);
         button.setForeground(Color.WHITE);
         button.setFont(new Font("Arial", Font.BOLD, 12));
         button.setFocusPainted(false);
         button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
+        button.setOpaque(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // Rounded corners effect
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(color.brighter());
+        // Add functionality to quick action buttons
+        button.addActionListener(e -> {
+            Container parent = getParent();
+            while (parent != null && !(parent instanceof JFrame)) {
+                parent = parent.getParent();
             }
             
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(color);
+            if (parent instanceof JFrame) {
+                JFrame frame = (JFrame) parent;
+                Component[] components = frame.getContentPane().getComponents();
+                
+                for (Component comp : components) {
+                    if (comp instanceof JPanel) {
+                        JPanel panel = (JPanel) comp;
+                        if (panel.getLayout() instanceof CardLayout) {
+                            CardLayout cardLayout = (CardLayout) panel.getLayout();
+                            
+                            switch (text) {
+                                case "Add Room":
+                                    cardLayout.show(panel, "Rooms");
+                                    break;
+                                case "Add Guest":
+                                    cardLayout.show(panel, "Guests");
+                                    break;
+                                case "New Reservation":
+                                    cardLayout.show(panel, "Reservations");
+                                    break;
+                                case "View Reports":
+                                    cardLayout.show(panel, "Billing");
+                                    break;
+                            }
+                            break;
+                        }
+                    }
+                }
             }
         });
         

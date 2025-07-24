@@ -64,14 +64,14 @@ public class BillingPanel extends JPanel {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setOpaque(false);
         
-        // Table panel with white background and border - exactly like reference
-        JPanel tablePanel = new JPanel(new BorderLayout());
-        tablePanel.setBackground(Color.WHITE);
-        tablePanel.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240), 1));
-        
+        // Table panel with rounded corners
+        RoundedPanel tablePanel = new RoundedPanel(12, Color.WHITE);
+        tablePanel.setLayout(new BorderLayout());
+
         JScrollPane scrollPane = new JScrollPane(billingTable);
         scrollPane.setBorder(null);
         scrollPane.getViewport().setBackground(Color.WHITE);
+        scrollPane.setOpaque(false);
         tablePanel.add(scrollPane, BorderLayout.CENTER);
         
         mainPanel.add(tablePanel, BorderLayout.CENTER);
@@ -85,13 +85,7 @@ public class BillingPanel extends JPanel {
     
     private JPanel createFormPanel() {
         ModernFormPanel formPanel = new ModernFormPanel("Bill Details");
-        formPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createEmptyBorder(20, 0, 0, 0),
-            BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)
-            )
-        ));
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
         
         JPanel fieldsPanel = new JPanel(new GridBagLayout());
         fieldsPanel.setOpaque(false);
@@ -288,3 +282,4 @@ public class BillingPanel extends JPanel {
         }
     }
 }
+\`\`\`</merged_code>

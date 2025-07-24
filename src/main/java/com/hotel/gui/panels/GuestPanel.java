@@ -8,6 +8,31 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import java.awt.geom.RoundRectangle2D;
+
+class RoundedPanel extends JPanel {
+    private int cornerRadius;
+    private Color backgroundColor;
+
+    public RoundedPanel(int cornerRadius, Color backgroundColor) {
+        this.cornerRadius = cornerRadius;
+        this.backgroundColor = backgroundColor;
+        setOpaque(false); // Important: Make the panel transparent
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Paint the background with rounded corners
+        g2.setColor(backgroundColor);
+        g2.fillRoundRect(0, 0, getWidth(), getHeight(), cornerRadius, cornerRadius);
+
+        g2.dispose();
+        super.paintComponent(g);
+    }
+}
 
 public class GuestPanel extends JPanel {
     private ModernTable guestTable;
@@ -24,9 +49,9 @@ public class GuestPanel extends JPanel {
     }
     
     private void initializeComponents() {
-        setBackground(new Color(243, 244, 246)); // Light gray background like reference
+        setBackground(new Color(243, 244, 246));
         
-        // Table setup - exactly like reference
+        // Table setup
         String[] columnNames = {"ID", "Full Name", "Phone", "ID/Passport", "Address"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
@@ -40,21 +65,40 @@ public class GuestPanel extends JPanel {
         nameField = ModernFormPanel.createModernTextField();
         phoneField = ModernFormPanel.createModernTextField();
         idField = ModernFormPanel.createModernTextField();
-        addressArea = new JTextArea(3, 20);
+        
+        // Rounded address area
+        addressArea = new JTextArea(3, 20) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Paint rounded background
+                g2d.setColor(getBackground());
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                
+                // Paint border
+                g2d.setColor(new Color(209, 213, 219));
+                g2d.setStroke(new BasicStroke(1));
+                g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
+                
+                g2d.dispose();
+                super.paintComponent(g);
+            }
+        };
+        
         addressArea.setLineWrap(true);
         addressArea.setWrapStyleWord(true);
         addressArea.setFont(new Font("Arial", Font.PLAIN, 13));
-        addressArea.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(209, 213, 219), 1),
-            BorderFactory.createEmptyBorder(8, 12, 8, 12)
-        ));
+        addressArea.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        addressArea.setOpaque(false);
     }
     
     private void setupLayout() {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
         
-        // Title - exactly like reference
+        // Title
         JLabel titleLabel = new JLabel("Guest Management");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
         titleLabel.setForeground(new Color(55, 65, 81));
@@ -65,14 +109,14 @@ public class GuestPanel extends JPanel {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setOpaque(false);
         
-        // Table panel - clean white background like reference
-        JPanel tablePanel = new JPanel(new BorderLayout());
-        tablePanel.setBackground(Color.WHITE);
-        tablePanel.setBorder(BorderFactory.createLineBorder(new Color(229, 231, 235), 1));
+        // Table panel with rounded corners
+        RoundedPanel tablePanel = new RoundedPanel(12, Color.WHITE);
+        tablePanel.setLayout(new BorderLayout());
         
         JScrollPane scrollPane = new JScrollPane(guestTable);
         scrollPane.setBorder(null);
         scrollPane.getViewport().setBackground(Color.WHITE);
+        scrollPane.setOpaque(false);
         tablePanel.add(scrollPane, BorderLayout.CENTER);
         
         mainPanel.add(tablePanel, BorderLayout.CENTER);
@@ -86,13 +130,7 @@ public class GuestPanel extends JPanel {
     
     private JPanel createFormPanel() {
         ModernFormPanel formPanel = new ModernFormPanel("Guest Details");
-        formPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createEmptyBorder(20, 0, 0, 0),
-            BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(229, 231, 235), 1),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)
-            )
-        ));
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
         
         JPanel fieldsPanel = new JPanel(new GridBagLayout());
         fieldsPanel.setOpaque(false);

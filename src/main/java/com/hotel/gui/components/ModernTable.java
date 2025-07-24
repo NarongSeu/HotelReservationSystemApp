@@ -13,17 +13,31 @@ public class ModernTable extends JTable {
         super(model);
         setupModernStyling();
     }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g.create();
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Paint rounded background
+        g2d.setColor(getBackground());
+        g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+
+        g2d.dispose();
+        super.paintComponent(g);
+    }
     
     private void setupModernStyling() {
-        // Table styling - exactly like reference (clean and minimal)
+        // Table styling with rounded corners
         setRowHeight(40);
         setShowGrid(true);
-        setGridColor(new Color(229, 231, 235)); // Very light gray grid
+        setGridColor(new Color(229, 231, 235));
         setIntercellSpacing(new Dimension(1, 1));
-        setSelectionBackground(new Color(239, 246, 255)); // Very light blue selection
+        setSelectionBackground(new Color(239, 246, 255));
         setSelectionForeground(new Color(55, 65, 81));
         setBackground(Color.WHITE);
         setFont(new Font("Arial", Font.PLAIN, 13));
+        setOpaque(false); // Make transparent for rounded corners
         
         // Header styling - exactly matching reference
         JTableHeader header = getTableHeader();
