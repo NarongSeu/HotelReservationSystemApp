@@ -8,19 +8,24 @@ import java.awt.*;
 public class HotelReservationSystemApp {
     
     public static void main(String[] args) {
+        System.out.println("Starting Hotel Reservation System...");
+        
         // Set system look and feel with fallback options
         setLookAndFeel();
         
         // Show splash screen
         showSplashScreen();
         
-        // Test database connection
+        // Test database connection and launch application
         SwingUtilities.invokeLater(() -> {
-            if (testDatabaseConnection()) {
-                // Launch main application
+            boolean dbConnected = testDatabaseConnection();
+            
+            if (dbConnected) {
+                System.out.println("Launching application with database connection...");
                 new MainDashboard();
             } else {
-                showDatabaseErrorDialog();
+                System.out.println("Launching application in demo mode (no database)...");
+                showDatabaseWarningAndContinue();
             }
         });
     }
@@ -29,21 +34,25 @@ public class HotelReservationSystemApp {
         try {
             // Try system look and feel first
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeel());
+            System.out.println("Using system look and feel");
         } catch (Exception e1) {
             try {
                 // Fallback to cross-platform look and feel
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeel());
+                System.out.println("Using cross-platform look and feel");
             } catch (Exception e2) {
                 try {
                     // Try Nimbus look and feel
                     for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                         if ("Nimbus".equals(info.getName())) {
                             UIManager.setLookAndFeel(info.getClassName());
+                            System.out.println("Using Nimbus look and feel");
                             return;
                         }
                     }
                     // Default Metal look and feel
                     UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+                    System.out.println("Using Metal look and feel");
                 } catch (Exception e3) {
                     System.err.println("Could not set look and feel, using default: " + e3.getMessage());
                 }
@@ -71,7 +80,7 @@ public class HotelReservationSystemApp {
         JProgressBar progressBar = new JProgressBar();
         progressBar.setIndeterminate(true);
         progressBar.setStringPainted(true);
-        progressBar.setString("Initializing Database...");
+        progressBar.setString("Initializing Application...");
         
         panel.add(titleLabel, BorderLayout.NORTH);
         panel.add(subtitleLabel, BorderLayout.CENTER);
@@ -82,7 +91,7 @@ public class HotelReservationSystemApp {
         
         // Simulate loading time
         try {
-            Thread.sleep(3000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -108,16 +117,22 @@ public class HotelReservationSystemApp {
         }
     }
     
-    private static void showDatabaseErrorDialog() {
-        String message = "Database Connection Failed!\n\n" +
-            "Please ensure:\n" +
-            "1. MySQL server is running\n" +
-            "2. Database 'hotel_db' exists or can be created\n" +
-            "3. Username and password are correct\n" +
-            "4. MySQL Connector J 9.3.0 is in classpath\n\n" +
-            "Check DatabaseConnection.java for configuration.";
+    private static void showDatabaseWarningAndContinue() {
+        String message = "Database Connection Warning!\n\n" +
+            "The application will run in demo mode without database functionality.\n\n" +
+            "To enable full functionality:\n" +
+            "1. Install and start MySQL server\n" +
+            "2. Update credentials in DatabaseConnection.java\n" +
+            "3. Restart the application\n\n" +
+            "Click OK to continue in demo mode.";
         
-        JOptionPane.showMessageDialog(null, message, "Database Error", JOptionPane.ERROR_MESSAGE);
-        System.exit(1);
+        int result = JOptionPane.showConfirmDialog(null, message, "Database Warning", 
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+        
+        if (result == JOptionPane.OK_OPTION) {
+            new MainDashboard();
+        } else {
+            System.exit(0);
+        }
     }
 }

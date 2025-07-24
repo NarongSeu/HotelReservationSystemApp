@@ -10,8 +10,19 @@ public class DatabaseConnection {
     private static final String USERNAME = "root";
     private static final String PASSWORD = "password";
     private static Connection connection = null;
+    private static boolean connectionTested = false;
+    private static boolean connectionAvailable = false;
     
     public static Connection getConnection() {
+        if (!connectionTested) {
+            testConnectionAvailability();
+        }
+        
+        if (!connectionAvailable) {
+            System.err.println("Database connection is not available. Please check MySQL server.");
+            return null;
+        }
+        
         try {
             if (connection == null || connection.isClosed()) {
                 // Load MySQL Connector J 9.3.0 driver
@@ -24,15 +35,43 @@ public class DatabaseConnection {
             }
         } catch (ClassNotFoundException e) {
             System.err.println("MySQL Connector J driver not found!");
-            e.printStackTrace();
+            System.err.println("Please ensure mysql-connector-j-9.3.0.jar is in your classpath");
+            connectionAvailable = false;
+            return null;
         } catch (SQLException e) {
-            System.err.println("Database connection failed!");
-            e.printStackTrace();
+            System.err.println("Database connection failed: " + e.getMessage());
+            connectionAvailable = false;
+            return null;
         }
         return connection;
     }
     
+    private static void testConnectionAvailability() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection testConn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            if (testConn != null && !testConn.isClosed()) {
+                connectionAvailable = true;
+                testConn.close();
+                System.out.println("Database connection test successful!");
+            }
+        } catch (ClassNotFoundException e) {
+            System.err.println("MySQL Connector J driver not found!");
+            connectionAvailable = false;
+        } catch (SQLException e) {
+            System.err.println("Database connection test failed: " + e.getMessage());
+            System.err.println("Please ensure:");
+            System.err.println("1. MySQL server is running");
+            System.err.println("2. Database credentials are correct");
+            System.err.println("3. MySQL is accessible on localhost:3306");
+            connectionAvailable = false;
+        }
+        connectionTested = true;
+    }
+    
     private static void initializeDatabase() {
+        if (connection == null) return;
+        
         try (Statement stmt = connection.createStatement()) {
             // Create database if it doesn't exist
             stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS hotel_db");
@@ -204,11 +243,13 @@ public class DatabaseConnection {
     
     // Test connection method
     public static boolean testConnection() {
-        try {
-            Connection conn = getConnection();
-            return conn != null && !conn.isClosed();
-        } catch (SQLException e) {
-            return false;
+        if (!connectionTested) {
+            testConnectionAvailability();
         }
+        return connectionAvailable;
+    }
+    
+    public static boolean isConnectionAvailable() {
+        return connectionAvailable;
     }
 }
