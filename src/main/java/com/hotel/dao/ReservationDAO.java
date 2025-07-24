@@ -79,18 +79,50 @@ public class ReservationDAO {
     }
     
     public boolean deleteReservation(int reservationId) {
-        String sql = "DELETE FROM Reservations WHERE reservation_id=?";
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        // Start transaction
+        conn.setAutoCommit(false);
         
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try {
+            // First delete related records from CheckInOut table
+            String deleteCheckInOutSql = "DELETE FROM CheckInOut WHERE reservation_id=?";
+            try (PreparedStatement pstmt1 = conn.prepareStatement(deleteCheckInOutSql)) {
+                pstmt1.setInt(1, reservationId);
+                pstmt1.executeUpdate();
+            }
             
-            pstmt.setInt(1, reservationId);
-            return pstmt.executeUpdate() > 0;
+            // Then delete related records from Billing table
+            String deleteBillingSql = "DELETE FROM Billing WHERE reservation_id=?";
+            try (PreparedStatement pstmt2 = conn.prepareStatement(deleteBillingSql)) {
+                pstmt2.setInt(1, reservationId);
+                pstmt2.executeUpdate();
+            }
+            
+            // Finally delete the reservation
+            String deleteReservationSql = "DELETE FROM Reservations WHERE reservation_id=?";
+            try (PreparedStatement pstmt3 = conn.prepareStatement(deleteReservationSql)) {
+                pstmt3.setInt(1, reservationId);
+                int result = pstmt3.executeUpdate();
+                
+                // Commit transaction
+                conn.commit();
+                return result > 0;
+            }
+            
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            // Rollback transaction on error
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
         }
+        
+    } catch (SQLException e) {
+        System.err.println("Error deleting reservation: " + e.getMessage());
+        e.printStackTrace();
+        return false;
     }
+}
     
     public boolean checkIn(int reservationId) {
         String sql = "UPDATE Reservations SET status='Checked-In' WHERE reservation_id=?";

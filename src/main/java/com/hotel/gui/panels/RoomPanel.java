@@ -217,10 +217,29 @@ public class RoomPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Room type is required!");
             return false;
         }
+        
+        // Fix price validation - handle the $ symbol
+        String priceText = priceField.getText().trim();
+        if (priceText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Price is required!");
+            return false;
+        }
+        
         try {
-            new BigDecimal(priceField.getText().trim());
+            // Remove $ symbol if present
+            if (priceText.startsWith("$")) {
+                priceText = priceText.substring(1);
+            }
+            // Remove any commas
+            priceText = priceText.replace(",", "");
+            
+            BigDecimal price = new BigDecimal(priceText);
+            if (price.compareTo(BigDecimal.ZERO) <= 0) {
+                JOptionPane.showMessageDialog(this, "Price must be greater than 0!");
+                return false;
+            }
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Please enter a valid price!");
+            JOptionPane.showMessageDialog(this, "Please enter a valid price (numbers only)!");
             return false;
         }
         return true;
@@ -230,7 +249,15 @@ public class RoomPanel extends JPanel {
         Room room = new Room();
         room.setRoomNumber(roomNumberField.getText().trim());
         room.setRoomType(roomTypeField.getText().trim());
-        room.setPrice(new BigDecimal(priceField.getText().trim()));
+        
+        // Handle price with $ symbol
+        String priceText = priceField.getText().trim();
+        if (priceText.startsWith("$")) {
+            priceText = priceText.substring(1);
+        }
+        priceText = priceText.replace(",", "");
+        
+        room.setPrice(new BigDecimal(priceText));
         room.setStatus((String) statusComboBox.getSelectedItem());
         return room;
     }

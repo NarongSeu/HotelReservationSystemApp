@@ -256,10 +256,21 @@ public class ReservationPanel extends JPanel {
             return;
         }
         
+        // Check if reservation can be deleted (not checked-in)
+        String status = (String) tableModel.getValueAt(selectedRow, 5);
+        if ("Checked-In".equals(status)) {
+            JOptionPane.showMessageDialog(this, 
+                "Cannot delete a checked-in reservation. Please check out the guest first.", 
+                "Cannot Delete", 
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
         int confirm = JOptionPane.showConfirmDialog(this, 
-            "Are you sure you want to delete this reservation?", 
+            "Are you sure you want to delete this reservation?\nThis will also delete related billing and check-in/out records.", 
             "Confirm Delete", 
-            JOptionPane.YES_NO_OPTION);
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
         
         if (confirm == JOptionPane.YES_OPTION) {
             int reservationId = (Integer) tableModel.getValueAt(selectedRow, 0);
@@ -268,7 +279,10 @@ public class ReservationPanel extends JPanel {
                 refreshData();
                 clearForm();
             } else {
-                JOptionPane.showMessageDialog(this, "Error deleting reservation!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, 
+                    "Error deleting reservation!\nThis reservation may have related records that prevent deletion.", 
+                    "Delete Error", 
+                    JOptionPane.ERROR_MESSAGE);
             }
         }
     }
