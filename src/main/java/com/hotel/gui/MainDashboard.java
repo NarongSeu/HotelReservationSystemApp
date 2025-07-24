@@ -100,7 +100,7 @@ public class MainDashboard extends JFrame {
         userIcon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
         
         JLabel userLabel = new JLabel("Admin User");
-        userLabel.setFont(new Font("Arial", Font.MEDIUM, 14));
+        userLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         userLabel.setForeground(new Color(75, 85, 99));
         
         userPanel.add(userIcon);
