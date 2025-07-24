@@ -176,22 +176,22 @@ public class MainDashboard extends JFrame {
         button.setFont(new Font("Arial", Font.PLAIN, 14));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // Create content panel
-        JPanel contentPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-        contentPanel.setOpaque(false);
-        
+        // Create button content panel (rename to avoid conflict)
+        JPanel buttonContentPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        buttonContentPanel.setOpaque(false);
+
         // Icon label
         JLabel iconLabel = new JLabel(icon);
         iconLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        
+
         // Text label
         JLabel textLabel = new JLabel(text);
         textLabel.setForeground(Color.WHITE);
         textLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        
-        contentPanel.add(iconLabel);
-        contentPanel.add(textLabel);
-        button.add(contentPanel);
+
+        buttonContentPanel.add(iconLabel);
+        buttonContentPanel.add(textLabel);
+        button.add(buttonContentPanel);
         
         button.addActionListener(new ActionListener() {
             @Override
@@ -201,7 +201,8 @@ public class MainDashboard extends JFrame {
                     return;
                 }
                 
-                cardLayout.show(contentPanel, text);
+                // Use MainDashboard.this.contentPanel to refer to the class field
+                cardLayout.show(MainDashboard.this.contentPanel, text);
                 
                 // Refresh panels when switching
                 switch (text) {
