@@ -95,7 +95,7 @@ public class MainDashboard extends JFrame {
         userPanel.setOpaque(false);
         
         // User icon
-        JLabel userIcon = new JLabel("👤");
+        JLabel userIcon = new JLabel("●");
         userIcon.setFont(new Font("Arial", Font.PLAIN, 16));
         userIcon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
         
@@ -121,32 +121,34 @@ public class MainDashboard extends JFrame {
         logoPanel.setOpaque(false);
         logoPanel.setMaximumSize(new Dimension(250, 60));
         
-        JLabel logoIcon = new JLabel("⌂"); // House symbol instead of hotel emoji
-        logoIcon.setFont(new Font("Arial", Font.BOLD, 24));
+        JLabel logoIcon = new JLabel("■");
+        logoIcon.setFont(new Font("Arial", Font.BOLD, 20));
+        logoIcon.setForeground(Color.WHITE);
         
         JLabel titleLabel = new JLabel("Hotel System");
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         
         logoPanel.add(logoIcon);
+        logoPanel.add(Box.createHorizontalStrut(8));
         logoPanel.add(titleLabel);
         navPanel.add(logoPanel);
         navPanel.add(Box.createRigidArea(new Dimension(0, 40)));
         
-        // Navigation buttons - centered
+        // Navigation buttons - centered with proper alignment
         String[] buttonNames = {"Dashboard", "Rooms", "Guests", "Reservations", "Billing"};
-        String[] buttonIcons = {"▣", "⌂", "⚪", "☰", "$"}; // Replace emoji with professional icons
+        String[] buttonIcons = {"■", "▢", "●", "≡", "$"}; // Clean, consistent icons
         
         for (int i = 0; i < buttonNames.length; i++) {
             JPanel buttonWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
             buttonWrapper.setOpaque(false);
-            buttonWrapper.setMaximumSize(new Dimension(250, 45));
+            buttonWrapper.setMaximumSize(new Dimension(250, 50));
             
             JButton button = createModernNavButton(buttonNames[i], buttonIcons[i]);
             buttonWrapper.add(button);
             
             navPanel.add(buttonWrapper);
-            navPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+            navPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         }
         
         // Add flexible space
@@ -155,9 +157,9 @@ public class MainDashboard extends JFrame {
         // Logout button - centered
         JPanel logoutWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         logoutWrapper.setOpaque(false);
-        logoutWrapper.setMaximumSize(new Dimension(250, 45));
+        logoutWrapper.setMaximumSize(new Dimension(250, 50));
         
-        JButton logoutButton = createModernNavButton("Logout", "⏻"); // Power symbol instead of door emoji
+        JButton logoutButton = createModernNavButton("Logout", "◐");
         logoutWrapper.add(logoutButton);
         navPanel.add(logoutWrapper);
         
@@ -166,32 +168,36 @@ public class MainDashboard extends JFrame {
     
     private JButton createModernNavButton(String text, String icon) {
         JButton button = new JButton();
-        button.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 12));
-        button.setPreferredSize(new Dimension(180, 45));
+        button.setLayout(new BorderLayout());
+        button.setPreferredSize(new Dimension(200, 45));
         button.setBackground(new Color(255, 255, 255, 0));
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setContentAreaFilled(false);
-        button.setFont(new Font("Arial", Font.PLAIN, 14));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // Create button content panel (rename to avoid conflict)
-        JPanel buttonContentPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-        buttonContentPanel.setOpaque(false);
-
-        // Icon label
+        // Create properly aligned content
+        JPanel buttonContent = new JPanel(new BorderLayout());
+        buttonContent.setOpaque(false);
+        buttonContent.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+        
+        // Icon with fixed width for alignment
         JLabel iconLabel = new JLabel(icon);
         iconLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-
+        iconLabel.setForeground(Color.WHITE);
+        iconLabel.setPreferredSize(new Dimension(20, 20));
+        iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        
         // Text label
         JLabel textLabel = new JLabel(text);
         textLabel.setForeground(Color.WHITE);
         textLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-
-        buttonContentPanel.add(iconLabel);
-        buttonContentPanel.add(textLabel);
-        button.add(buttonContentPanel);
+        textLabel.setBorder(BorderFactory.createEmptyBorder(0, 12, 0, 0));
+        
+        buttonContent.add(iconLabel, BorderLayout.WEST);
+        buttonContent.add(textLabel, BorderLayout.CENTER);
+        button.add(buttonContent, BorderLayout.CENTER);
         
         button.addActionListener(new ActionListener() {
             @Override
