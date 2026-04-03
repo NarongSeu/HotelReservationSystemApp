@@ -15,7 +15,7 @@ public class DatabaseTest {
             Connection conn = DatabaseConnection.getConnection();
             
             if (conn != null && !conn.isClosed()) {
-                System.out.println("✅ Database connection successful!");
+                System.out.println("Database connection successful!");
                 System.out.println("Database URL: jdbc:mysql://localhost:3306/hotel_db");
                 System.out.println("Connection valid: " + conn.isValid(5));
                 
@@ -41,7 +41,7 @@ public class DatabaseTest {
             System.out.println("4. Ensure MySQL Connector J is in classpath");
         } catch (Exception e) {
             System.out.println("❌ Unexpected error: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         } finally {
             DatabaseConnection.closeConnection();
         }

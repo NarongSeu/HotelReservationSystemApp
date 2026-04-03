@@ -93,7 +93,7 @@ public class HotelReservationSystemApp {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         
         splash.dispose();
@@ -112,7 +112,7 @@ public class HotelReservationSystemApp {
             }
         } catch (Exception e) {
             System.err.println("Error testing database connection: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return false;
         }
     }

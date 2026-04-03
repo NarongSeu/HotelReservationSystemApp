@@ -12,18 +12,20 @@ public class GuestDAO {
         List<Guest> guests = new ArrayList<>();
         String sql = "SELECT * FROM Guests ORDER BY full_name";
         
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-            
-            while (rs.next()) {
-                Guest guest = new Guest();
-                guest.setGuestId(rs.getInt("guest_id"));
-                guest.setFullName(rs.getString("full_name"));
-                guest.setPhone(rs.getString("phone"));
-                guest.setIdPassport(rs.getString("id_passport"));
-                guest.setAddress(rs.getString("address"));
-                guests.add(guest);
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            assert conn != null;
+            try (PreparedStatement stmt = conn.prepareStatement(sql);
+                 ResultSet rs = stmt.executeQuery()) {
+
+                while (rs.next()) {
+                    Guest guest = new Guest();
+                    guest.setGuestId(rs.getInt("guest_id"));
+                    guest.setFullName(rs.getString("full_name"));
+                    guest.setPhone(rs.getString("phone"));
+                    guest.setIdPassport(rs.getString("id_passport"));
+                    guest.setAddress(rs.getString("address"));
+                    guests.add(guest);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
