@@ -1,9 +1,12 @@
 package com.hotel.util;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
@@ -110,6 +113,9 @@ public class DatabaseConnection {
             // Create tables according to your schema
             createTables(stmt);
 
+            // Insert default local users
+            insertDefaultUsers();
+
             // Insert sample data
             insertSampleData(stmt);
 
@@ -202,6 +208,18 @@ public class DatabaseConnection {
                 "FOREIGN KEY (item_id) REFERENCES RoomServiceItems(item_id)" +
                 ")";
 
+        String createUsersTable = "CREATE TABLE IF NOT EXISTS hotel_users (" +
+                "id INT PRIMARY KEY AUTO_INCREMENT," +
+                "email VARCHAR(150) NOT NULL UNIQUE," +
+                "password_hash VARCHAR(255) NOT NULL," +
+                "full_name VARCHAR(100) NOT NULL," +
+                "phone VARCHAR(20)," +
+                "role VARCHAR(20) NOT NULL DEFAULT 'customer'," +
+                "is_active BOOLEAN NOT NULL DEFAULT TRUE," +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" +
+                ")";
+
         stmt.executeUpdate(createRoomsTable);
         stmt.executeUpdate(createGuestsTable);
         stmt.executeUpdate(createReservationsTable);
@@ -210,8 +228,35 @@ public class DatabaseConnection {
         stmt.executeUpdate(createRoomServiceItemsTable);
         stmt.executeUpdate(createRoomServiceOrdersTable);
         stmt.executeUpdate(createOrderDetailsTable);
+        stmt.executeUpdate(createUsersTable);
 
         System.out.println("All tables created successfully!");
+    }
+
+    private static void insertDefaultUsers() throws SQLException {
+        if (connection == null) {
+            return;
+        }
+
+        String sql = "INSERT INTO hotel_users (email, password_hash, full_name, phone, role, is_active) " +
+                "VALUES (?, ?, ?, ?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE email = email";
+
+        insertDefaultUser(sql, "admin@hotel.com", "password123", "System Administrator", "+1-555-0001", "admin");
+        insertDefaultUser(sql, "staff@hotel.com", "password123", "Front Desk Staff", "+1-555-0002", "staff");
+    }
+
+    private static void insertDefaultUser(String sql, String email, String password, String fullName,
+                                          String phone, String role) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            stmt.setString(2, BCrypt.hashpw(password, BCrypt.gensalt(12)));
+            stmt.setString(3, fullName);
+            stmt.setString(4, phone);
+            stmt.setString(5, role);
+            stmt.setBoolean(6, true);
+            stmt.executeUpdate();
+        }
     }
 
     private static void insertSampleData(Statement stmt) throws SQLException {
@@ -234,23 +279,23 @@ public class DatabaseConnection {
                 "('401', 'Deluxe', 250.00, 'Available')," +
                 "('402', 'Deluxe', 250.00, 'Available')";
 
-        // Insert sample guests
+// Insert sample guests (Khmer style)
         String insertGuests = "INSERT INTO Guests (full_name, phone, id_passport, address) VALUES " +
-                "('John Doe', '+1-555-0101', 'P123456789', '123 Main St, New York, NY')," +
-                "('Jane Smith', '+1-555-0102', 'DL987654321', '456 Oak Ave, Los Angeles, CA')," +
-                "('Robert Johnson', '+1-555-0103', 'ID456789123', '789 Pine Rd, Chicago, IL')," +
-                "('Emily Davis', '+44-20-7946-0958', 'P987654321', '10 Downing St, London, UK')," +
-                "('Michael Wilson', '+1-555-0105', 'P111222333', '321 Elm St, Miami, FL')";
+                "('Sok Dara', '+855-12-345-678', 'K12345678', 'Phnom Penh, Cambodia')," +
+                "('Chantha Srey', '+855-15-987-654', 'K87654321', 'Siem Reap, Cambodia')," +
+                "('Vannak Rith', '+855-10-112-233', 'K11223344', 'Battambang, Cambodia')," +
+                "('Sopheaktra Ly', '+855-77-445-566', 'K55667788', 'Kampot, Cambodia')," +
+                "('Pisey Heng', '+855-93-778-899', 'K99887766', 'Sihanoukville, Cambodia')";
 
-        // Insert sample room service items
+// Insert sample room service items (localized)
         String insertRoomServiceItems = "INSERT INTO RoomServiceItems (item_name, description, price, category) VALUES " +
-                "('Club Sandwich', 'Triple-decker sandwich with turkey, bacon, lettuce, tomato', 15.99, 'Food')," +
-                "('Caesar Salad', 'Fresh romaine lettuce with caesar dressing and croutons', 12.99, 'Food')," +
-                "('Grilled Salmon', 'Atlantic salmon with lemon butter sauce', 24.99, 'Food')," +
-                "('Coffee', 'Freshly brewed coffee', 4.99, 'Beverage')," +
-                "('Orange Juice', 'Fresh squeezed orange juice', 6.99, 'Beverage')," +
-                "('Laundry Service', 'Same-day laundry service', 25.00, 'Laundry')," +
-                "('Room Cleaning', 'Additional room cleaning service', 30.00, 'Service')";
+                "('Amok Trey', 'Traditional Khmer fish curry steamed in banana leaves', 8.99, 'Food')," +
+                "('Lok Lak', 'Stir-fried beef with pepper sauce and rice', 9.99, 'Food')," +
+                "('Fried Rice', 'Khmer-style fried rice with vegetables and meat', 7.99, 'Food')," +
+                "('Khmer Coffee', 'Strong Cambodian iced coffee with milk', 2.50, 'Beverage')," +
+                "('Sugar Cane Juice', 'Freshly pressed sugar cane juice', 2.00, 'Beverage')," +
+                "('Laundry Service', 'Same-day laundry service', 10.00, 'Laundry')," +
+                "('Room Cleaning', 'Additional room cleaning service', 12.00, 'Service')";
 
         stmt.executeUpdate(insertRooms);
         stmt.executeUpdate(insertGuests);
@@ -278,6 +323,9 @@ public class DatabaseConnection {
     }
 
     public static boolean isConnectionAvailable() {
+        if (!connectionTested) {
+            testConnectionAvailability();
+        }
         return connectionAvailable;
     }
 }

@@ -111,14 +111,77 @@ public class RoomDAO {
                 "Demo Mode", JOptionPane.INFORMATION_MESSAGE);
             return false;
         }
-        
-        String sql = "DELETE FROM Rooms WHERE room_id=?";
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setInt(1, roomId);
-            return pstmt.executeUpdate() > 0;
+
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            if (conn == null) return false;
+
+            // Cascade delete at application layer to avoid orphan Reservations.
+            conn.setAutoCommit(false);
+            try {
+                // Delete room service details first (depends on RoomServiceOrders).
+                String deleteOrderDetailsSql =
+                        "DELETE FROM OrderDetails WHERE order_id IN (" +
+                        "  SELECT order_id FROM RoomServiceOrders WHERE reservation_id IN (" +
+                        "    SELECT reservation_id FROM Reservations WHERE room_id=? " +
+                        "  )" +
+                        ")";
+                try (PreparedStatement pstmt = conn.prepareStatement(deleteOrderDetailsSql)) {
+                    pstmt.setInt(1, roomId);
+                    pstmt.executeUpdate();
+                }
+
+                // Delete room service orders tied to the room's reservations.
+                String deleteRoomServiceOrdersSql =
+                        "DELETE FROM RoomServiceOrders WHERE reservation_id IN (" +
+                        "  SELECT reservation_id FROM Reservations WHERE room_id=? " +
+                        ")";
+                try (PreparedStatement pstmt = conn.prepareStatement(deleteRoomServiceOrdersSql)) {
+                    pstmt.setInt(1, roomId);
+                    pstmt.executeUpdate();
+                }
+
+                // Delete check-in/out and billing tied to the room's reservations.
+                String deleteCheckInOutSql =
+                        "DELETE FROM CheckInOut WHERE reservation_id IN (" +
+                        "  SELECT reservation_id FROM Reservations WHERE room_id=? " +
+                        ")";
+                try (PreparedStatement pstmt = conn.prepareStatement(deleteCheckInOutSql)) {
+                    pstmt.setInt(1, roomId);
+                    pstmt.executeUpdate();
+                }
+
+                String deleteBillingSql =
+                        "DELETE FROM Billing WHERE reservation_id IN (" +
+                        "  SELECT reservation_id FROM Reservations WHERE room_id=? " +
+                        ")";
+                try (PreparedStatement pstmt = conn.prepareStatement(deleteBillingSql)) {
+                    pstmt.setInt(1, roomId);
+                    pstmt.executeUpdate();
+                }
+
+                // Delete reservations for the room.
+                String deleteReservationsSql = "DELETE FROM Reservations WHERE room_id=?";
+                try (PreparedStatement pstmt = conn.prepareStatement(deleteReservationsSql)) {
+                    pstmt.setInt(1, roomId);
+                    pstmt.executeUpdate();
+                }
+
+                // Finally delete the room row.
+                String deleteRoomSql = "DELETE FROM Rooms WHERE room_id=?";
+                int updated;
+                try (PreparedStatement pstmt = conn.prepareStatement(deleteRoomSql)) {
+                    pstmt.setInt(1, roomId);
+                    updated = pstmt.executeUpdate();
+                }
+
+                conn.commit();
+                return updated > 0;
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

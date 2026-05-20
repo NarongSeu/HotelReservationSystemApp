@@ -118,4 +118,24 @@ public class BillingDAO {
             return false;
         }
     }
+
+    public boolean deleteBill(int billId) {
+        if (!DatabaseConnection.isConnectionAvailable()) {
+            JOptionPane.showMessageDialog(null, "Database not available. Running in demo mode.",
+                "Demo Mode", JOptionPane.INFORMATION_MESSAGE);
+            return false;
+        }
+
+        String sql = "DELETE FROM Billing WHERE bill_id=?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, billId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

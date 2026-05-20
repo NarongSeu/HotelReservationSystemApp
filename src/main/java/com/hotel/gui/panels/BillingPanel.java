@@ -3,6 +3,7 @@ package com.hotel.gui.panels;
 import com.hotel.dao.BillingDAO;
 import com.hotel.dao.ReservationDAO;
 import com.hotel.model.Bill;
+import com.hotel.model.Reservation;
 import com.hotel.gui.ModernColors;
 import com.hotel.gui.components.ModernTable;
 import com.hotel.gui.components.ModernFormPanel;
@@ -18,11 +19,13 @@ public class BillingPanel extends JPanel {
     private ModernTable billingTable;
     private DefaultTableModel tableModel;
     private BillingDAO billingDAO;
+    private ReservationDAO reservationDAO;
     private JTextField totalAmountField, taxField, discountField;
     private JComboBox<String> paymentMethodCombo, paymentStatusCombo, reservationCombo;
     
     public BillingPanel() {
         billingDAO = new BillingDAO();
+        reservationDAO = new ReservationDAO();
         initializeComponents();
         setupLayout();
         refreshData();
@@ -47,7 +50,8 @@ public class BillingPanel extends JPanel {
         discountField = ModernFormPanel.createModernTextField();
         paymentMethodCombo = ModernFormPanel.createModernComboBox(new String[]{"Credit Card", "Cash", "Bank Transfer", "Check"});
         paymentStatusCombo = ModernFormPanel.createModernComboBox(new String[]{"Pending", "Paid", "Cancelled", "Refunded"});
-        reservationCombo = ModernFormPanel.createModernComboBox(new String[]{"Reservation #1", "Reservation #2", "Reservation #3"});
+        reservationCombo = ModernFormPanel.createModernComboBox(new String[0]);
+        loadReservationOptions();
     }
     
     private void setupLayout() {
@@ -212,9 +216,14 @@ public class BillingPanel extends JPanel {
             JOptionPane.YES_NO_OPTION);
         
         if (confirm == JOptionPane.YES_OPTION) {
-            JOptionPane.showMessageDialog(this, "Bill deleted successfully!");
-            refreshData();
-            clearForm();
+            int billId = (Integer) tableModel.getValueAt(selectedRow, 0);
+            if (billingDAO.deleteBill(billId)) {
+                JOptionPane.showMessageDialog(this, "Bill deleted successfully!");
+                refreshData();
+                clearForm();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error deleting bill!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
     
@@ -224,9 +233,15 @@ public class BillingPanel extends JPanel {
             return false;
         }
         try {
-            new BigDecimal(totalAmountField.getText().trim());
+            parseCurrencyField(totalAmountField.getText().trim(), "total amount");
+            parseCurrencyField(taxField.getText().trim(), "tax");
+            parseCurrencyField(discountField.getText().trim(), "discount");
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Please enter a valid total amount!");
+            JOptionPane.showMessageDialog(this, e.getMessage());
+            return false;
+        }
+        if (reservationCombo.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(this, "Please select a reservation!");
             return false;
         }
         return true;
@@ -234,10 +249,10 @@ public class BillingPanel extends JPanel {
     
     private Bill createBillFromForm() {
         Bill bill = new Bill();
-        bill.setReservationId(1); // Demo reservation ID
-        bill.setTotalAmount(new BigDecimal(totalAmountField.getText().trim()));
-        bill.setTax(taxField.getText().trim().isEmpty() ? BigDecimal.ZERO : new BigDecimal(taxField.getText().trim()));
-        bill.setDiscount(discountField.getText().trim().isEmpty() ? BigDecimal.ZERO : new BigDecimal(discountField.getText().trim()));
+        bill.setReservationId(extractReservationId((String) reservationCombo.getSelectedItem()));
+        bill.setTotalAmount(parseCurrencyField(totalAmountField.getText().trim(), "total amount"));
+        bill.setTax(parseCurrencyField(taxField.getText().trim(), "tax"));
+        bill.setDiscount(parseCurrencyField(discountField.getText().trim(), "discount"));
         bill.setPaymentMethod((String) paymentMethodCombo.getSelectedItem());
         bill.setPaymentStatus((String) paymentStatusCombo.getSelectedItem());
         bill.setIssuedDate(LocalDate.now());
@@ -261,7 +276,9 @@ public class BillingPanel extends JPanel {
         discountField.setText("");
         paymentMethodCombo.setSelectedIndex(0);
         paymentStatusCombo.setSelectedIndex(0);
-        reservationCombo.setSelectedIndex(0);
+        if (reservationCombo.getItemCount() > 0) {
+            reservationCombo.setSelectedIndex(0);
+        }
         billingTable.clearSelection();
     }
     
@@ -281,5 +298,46 @@ public class BillingPanel extends JPanel {
             };
             tableModel.addRow(row);
         }
+        loadReservationOptions();
+    }
+
+    private void loadReservationOptions() {
+        reservationCombo.removeAllItems();
+        List<Reservation> reservations = reservationDAO.getAllReservations();
+        for (Reservation reservation : reservations) {
+            reservationCombo.addItem(String.format("Reservation #%d - %s / Room %s",
+                    reservation.getReservationId(),
+                    reservation.getGuestName(),
+                    reservation.getRoomNumber()));
+        }
+        if (reservationCombo.getItemCount() > 0) {
+            reservationCombo.setSelectedIndex(0);
+        }
+    }
+
+    private BigDecimal parseCurrencyField(String value, String fieldName) {
+        if (value == null || value.trim().isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        String sanitized = value.trim().replace("$", "").replace(",", "");
+        try {
+            return new BigDecimal(sanitized);
+        } catch (NumberFormatException ex) {
+            throw new NumberFormatException("Please enter a valid " + fieldName + " amount.");
+        }
+    }
+
+    private int extractReservationId(String reservationLabel) {
+        if (reservationLabel == null || !reservationLabel.startsWith("Reservation #")) {
+            throw new IllegalArgumentException("Please select a reservation.");
+        }
+
+        String idPart = reservationLabel.substring("Reservation #".length());
+        int separatorIndex = idPart.indexOf(' ');
+        if (separatorIndex >= 0) {
+            idPart = idPart.substring(0, separatorIndex);
+        }
+        return Integer.parseInt(idPart);
     }
 }

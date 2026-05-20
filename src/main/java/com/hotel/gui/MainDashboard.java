@@ -2,6 +2,8 @@ package com.hotel.gui;
 
 import com.hotel.gui.panels.*;
 import com.hotel.gui.components.GradientPanel;
+import com.hotel.gui.Auth.LoginFrame;
+import com.hotel.model.User;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -11,17 +13,29 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 
 public class MainDashboard extends JFrame {
+    private final User currentUser;
     private JPanel contentPanel;
     private CardLayout cardLayout;
-    
+
     // Panel instances
     private RoomPanel roomPanel;
     private GuestPanel guestPanel;
     private ReservationPanel reservationPanel;
     private BillingPanel billingPanel;
     private DashboardPanel dashboardPanel;
-    
+
     public MainDashboard() {
+        this(null);
+    }
+
+    public MainDashboard(User user) {
+        this.currentUser = user;
+
+        if (!isAuthorizedAdmin(user)) {
+            redirectToLogin();
+            return;
+        }
+
         initializeComponents();
         setupLayout();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -31,7 +45,7 @@ public class MainDashboard extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setVisible(true);
     }
-    
+
     private void initializeComponents() {
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
@@ -105,7 +119,7 @@ public class MainDashboard extends JFrame {
         }
         userIcon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
         
-        JLabel userLabel = new JLabel("Admin User");
+        JLabel userLabel = new JLabel(getUserDisplayName());
         userLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         userLabel.setForeground(new Color(75, 85, 99));
         
@@ -259,7 +273,7 @@ public class MainDashboard extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if ("Logout".equals(text)) {
-                    System.exit(0);
+                    handleLogout();
                     return;
                 }
                 
@@ -304,5 +318,48 @@ public class MainDashboard extends JFrame {
         });
         
         return button;
+    }
+
+    private boolean isAuthorizedAdmin(User user) {
+        return user != null && user.isActive() && user.isAdmin();
+    }
+
+    private String getUserDisplayName() {
+        if (currentUser == null) {
+            return "Admin User";
+        }
+
+        String fullName = currentUser.getFullName();
+        if (fullName == null || fullName.isBlank()) {
+            return currentUser.getEmail();
+        }
+
+        return fullName + " (" + currentUser.getRole() + ")";
+    }
+
+    private void handleLogout() {
+        int result = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to logout?",
+                "Confirm Logout",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (result == JOptionPane.YES_OPTION) {
+            dispose();
+            SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
+        }
+    }
+
+    private void redirectToLogin() {
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Admin login is required to open the dashboard.",
+                    "Access Restricted",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+            new LoginFrame().setVisible(true);
+        });
     }
 }

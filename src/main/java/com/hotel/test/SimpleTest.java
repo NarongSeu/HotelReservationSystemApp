@@ -1,5 +1,6 @@
 package com.hotel.test;
 
+import com.hotel.model.User;
 import com.hotel.util.DatabaseConnection;
 
 public class SimpleTest {
@@ -25,7 +26,13 @@ public class SimpleTest {
             javax.swing.SwingUtilities.invokeLater(() -> {
                 try {
                     System.out.println("3. Creating main dashboard...");
-                    com.hotel.gui.MainDashboard dashboard = new com.hotel.gui.MainDashboard();
+                    User testUser = new User();
+                    testUser.setId("test-admin");
+                    testUser.setEmail("admin@hotel.com");
+                    testUser.setFullName("Test Administrator");
+                    testUser.setRole("admin");
+                    testUser.setActive(true);
+                    com.hotel.gui.MainDashboard dashboard = new com.hotel.gui.MainDashboard(testUser);
                     System.out.println("✅ Application started successfully!");
                     
                     // Close after 5 seconds for testing

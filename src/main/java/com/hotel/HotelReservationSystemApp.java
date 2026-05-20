@@ -1,28 +1,28 @@
 package com.hotel;
 
-import com.hotel.gui.MainDashboard;
+import com.hotel.gui.Auth.LoginFrame;
 import com.hotel.util.DatabaseConnection;
 import javax.swing.*;
 import java.awt.*;
 
 public class HotelReservationSystemApp {
-    
+
     public static void main(String[] args) {
         System.out.println("Starting Hotel Reservation System...");
-        
+
         // Set system look and feel with fallback options
         setLookAndFeel();
-        
+
         // Show splash screen
         showSplashScreen();
-        
+
         // Test database connection and launch application
         SwingUtilities.invokeLater(() -> {
             boolean dbConnected = testDatabaseConnection();
-            
+
             if (dbConnected) {
                 System.out.println("Launching application with database connection...");
-                new MainDashboard();
+                launchLoginFrame();
             } else {
                 System.out.println("Launching application in demo mode (no database)...");
                 showDatabaseWarningAndContinue();
@@ -59,46 +59,46 @@ public class HotelReservationSystemApp {
             }
         }
     }
-    
+
     private static void showSplashScreen() {
         JWindow splash = new JWindow();
         splash.setSize(400, 300);
         splash.setLocationRelativeTo(null);
-        
+
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(52, 73, 94));
         panel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
-        
+
         JLabel titleLabel = new JLabel("Hotel Reservation System", JLabel.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setForeground(Color.WHITE);
-        
+
         JLabel subtitleLabel = new JLabel("Loading...", JLabel.CENTER);
         subtitleLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         subtitleLabel.setForeground(Color.WHITE);
-        
+
         JProgressBar progressBar = new JProgressBar();
         progressBar.setIndeterminate(true);
         progressBar.setStringPainted(true);
         progressBar.setString("Initializing Application...");
-        
+
         panel.add(titleLabel, BorderLayout.NORTH);
         panel.add(subtitleLabel, BorderLayout.CENTER);
         panel.add(progressBar, BorderLayout.SOUTH);
-        
+
         splash.add(panel);
         splash.setVisible(true);
-        
+
         // Simulate loading time
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }
-        
+
         splash.dispose();
     }
-    
+
     private static boolean testDatabaseConnection() {
         try {
             System.out.println("Testing database connection...");
@@ -116,23 +116,35 @@ public class HotelReservationSystemApp {
             return false;
         }
     }
-    
+
     private static void showDatabaseWarningAndContinue() {
         String message = "Database Connection Warning!\n\n" +
             "The application will run in demo mode without database functionality.\n\n" +
             "To enable full functionality:\n" +
             "1. Install and start MySQL server\n" +
-            "2. Update credentials in DatabaseConnection.java\n" +
+            "2. Update credentials in src/main/resources/db.properties\n" +
             "3. Restart the application\n\n" +
             "Click OK to continue in demo mode.";
-        
-        int result = JOptionPane.showConfirmDialog(null, message, "Database Warning", 
+
+        int result = JOptionPane.showConfirmDialog(null, message, "Database Warning",
             JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-        
+
         if (result == JOptionPane.OK_OPTION) {
-            new MainDashboard();
+            launchLoginFrame();
         } else {
             System.exit(0);
+        }
+
+    }
+    public static void launchLoginFrame() {
+        try {
+            LoginFrame loginFrame = new LoginFrame();
+            loginFrame.setVisible(true);
+        } catch (Exception e) {
+            System.err.println("Failed to open LoginFrame: " + e.getMessage());
+            JOptionPane.showMessageDialog(null,
+                    "Could not open login screen: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

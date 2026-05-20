@@ -193,43 +193,34 @@ public class DashboardPanel extends JPanel {
         
         // Add functionality to quick action buttons
         button.addActionListener(e -> {
-            Container parent = getParent();
-            while (parent != null && !(parent instanceof JFrame)) {
-                parent = parent.getParent();
+            Container cardContainer = DashboardPanel.this.getParent();
+            while (cardContainer != null && !(cardContainer.getLayout() instanceof CardLayout)) {
+                cardContainer = cardContainer.getParent();
             }
-            
-            if (parent instanceof JFrame) {
-                JFrame frame = (JFrame) parent;
-                Component[] components = frame.getContentPane().getComponents();
-                
-                for (Component comp : components) {
-                    if (comp instanceof JPanel) {
-                        JPanel panel = (JPanel) comp;
-                        if (panel.getLayout() instanceof CardLayout) {
-                            CardLayout cardLayout = (CardLayout) panel.getLayout();
-                            
-                            switch (text) {
-                                case "Add Room":
-                                    cardLayout.show(panel, "Rooms");
-                                    break;
-                                case "Add Guest":
-                                    cardLayout.show(panel, "Guests");
-                                    break;
-                                case "New Reservation":
-                                    cardLayout.show(panel, "Reservations");
-                                    break;
-                                case "View Reports":
-                                    cardLayout.show(panel, "Billing");
-                                    break;
-                            }
-                            break;
-                        }
-                    }
-                }
+
+            if (cardContainer instanceof JPanel) {
+                JPanel panel = (JPanel) cardContainer;
+                CardLayout cardLayout = (CardLayout) panel.getLayout();
+                cardLayout.show(panel, resolveTargetCard(text));
             }
         });
         
         return button;
+    }
+
+    private String resolveTargetCard(String actionText) {
+        switch (actionText) {
+            case "Add Room":
+                return "Rooms";
+            case "Add Guest":
+                return "Guests";
+            case "New Reservation":
+                return "Reservations";
+            case "View Reports":
+                return "Billing";
+            default:
+                return "Dashboard";
+        }
     }
     
     public void refreshData() {

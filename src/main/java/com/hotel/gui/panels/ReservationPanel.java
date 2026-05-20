@@ -386,8 +386,12 @@ public class ReservationPanel extends JPanel {
     }
     
     private void clearForm() {
-        guestComboBox.setSelectedIndex(0);
-        roomComboBox.setSelectedIndex(0);
+        if (guestComboBox.getItemCount() > 0) {
+            guestComboBox.setSelectedIndex(0);
+        }
+        if (roomComboBox.getItemCount() > 0) {
+            roomComboBox.setSelectedIndex(0);
+        }
         checkInField.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         checkOutField.setText(LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         statusComboBox.setSelectedIndex(0);

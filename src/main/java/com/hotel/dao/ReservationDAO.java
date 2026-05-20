@@ -2,6 +2,7 @@ package com.hotel.dao;
 
 import com.hotel.model.Reservation;
 import com.hotel.util.DatabaseConnection;
+import javax.swing.JOptionPane;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,6 +12,10 @@ public class ReservationDAO {
     
     public List<Reservation> getAllReservations() {
         List<Reservation> reservations = new ArrayList<>();
+        if (!DatabaseConnection.isConnectionAvailable()) {
+            return getDemoReservations();
+        }
+
         String sql = "SELECT r.*, g.full_name, rm.room_number " +
             "FROM Reservations r " +
             "JOIN Guests g ON r.guest_id = g.guest_id " +
@@ -40,6 +45,11 @@ public class ReservationDAO {
     }
     
     public boolean addReservation(Reservation reservation) {
+        if (!DatabaseConnection.isConnectionAvailable()) {
+            showDemoModeMessage();
+            return false;
+        }
+
         String sql = "INSERT INTO Reservations (guest_id, room_id, check_in_date, check_out_date, status) VALUES (?, ?, ?, ?, ?)";
         
         try (Connection conn = DatabaseConnection.getConnection();
@@ -59,6 +69,11 @@ public class ReservationDAO {
     }
     
     public boolean updateReservation(Reservation reservation) {
+        if (!DatabaseConnection.isConnectionAvailable()) {
+            showDemoModeMessage();
+            return false;
+        }
+
         String sql = "UPDATE Reservations SET guest_id=?, room_id=?, check_in_date=?, check_out_date=?, status=? WHERE reservation_id=?";
         
         try (Connection conn = DatabaseConnection.getConnection();
@@ -79,11 +94,33 @@ public class ReservationDAO {
     }
     
     public boolean deleteReservation(int reservationId) {
+    if (!DatabaseConnection.isConnectionAvailable()) {
+        showDemoModeMessage();
+        return false;
+    }
+
     try (Connection conn = DatabaseConnection.getConnection()) {
         // Start transaction
         conn.setAutoCommit(false);
         
         try {
+            // Delete room service dependent rows first (OrderDetails -> RoomServiceOrders).
+            String deleteOrderDetailsSql =
+                    "DELETE FROM OrderDetails WHERE order_id IN (" +
+                    "  SELECT order_id FROM RoomServiceOrders WHERE reservation_id=? " +
+                    ")";
+            try (PreparedStatement pstmt1 = conn.prepareStatement(deleteOrderDetailsSql)) {
+                pstmt1.setInt(1, reservationId);
+                pstmt1.executeUpdate();
+            }
+
+            String deleteRoomServiceOrdersSql =
+                    "DELETE FROM RoomServiceOrders WHERE reservation_id=?";
+            try (PreparedStatement pstmt1 = conn.prepareStatement(deleteRoomServiceOrdersSql)) {
+                pstmt1.setInt(1, reservationId);
+                pstmt1.executeUpdate();
+            }
+
             // First delete related records from CheckInOut table
             String deleteCheckInOutSql = "DELETE FROM CheckInOut WHERE reservation_id=?";
             try (PreparedStatement pstmt1 = conn.prepareStatement(deleteCheckInOutSql)) {
@@ -125,6 +162,11 @@ public class ReservationDAO {
 }
     
     public boolean checkIn(int reservationId) {
+        if (!DatabaseConnection.isConnectionAvailable()) {
+            showDemoModeMessage();
+            return false;
+        }
+
         String sql = "UPDATE Reservations SET status='Checked-In' WHERE reservation_id=?";
         
         try (Connection conn = DatabaseConnection.getConnection();
@@ -148,6 +190,11 @@ public class ReservationDAO {
     }
     
     public boolean checkOut(int reservationId) {
+        if (!DatabaseConnection.isConnectionAvailable()) {
+            showDemoModeMessage();
+            return false;
+        }
+
         String sql = "UPDATE Reservations SET status='Checked-Out' WHERE reservation_id=?";
         
         try (Connection conn = DatabaseConnection.getConnection();
@@ -168,5 +215,32 @@ public class ReservationDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    private List<Reservation> getDemoReservations() {
+        List<Reservation> demoReservations = new ArrayList<>();
+        demoReservations.add(createDemoReservation(1, 1, 1, "Sok Dara", "101",
+                LocalDate.now().minusDays(1), LocalDate.now().plusDays(2), "Confirmed"));
+        demoReservations.add(createDemoReservation(2, 2, 4, "Chantha Srey", "202",
+                LocalDate.now().minusDays(3), LocalDate.now().plusDays(1), "Checked-In"));
+        demoReservations.add(createDemoReservation(3, 3, 5, "Vannak Rith", "301",
+                LocalDate.now().plusDays(2), LocalDate.now().plusDays(5), "Confirmed"));
+        return demoReservations;
+    }
+
+    private Reservation createDemoReservation(int reservationId, int guestId, int roomId, String guestName,
+                                              String roomNumber, LocalDate checkIn, LocalDate checkOut, String status) {
+        Reservation reservation = new Reservation(guestId, roomId, checkIn, checkOut, status);
+        reservation.setReservationId(reservationId);
+        reservation.setGuestName(guestName);
+        reservation.setRoomNumber(roomNumber);
+        return reservation;
+    }
+
+    private void showDemoModeMessage() {
+        JOptionPane.showMessageDialog(null,
+                "Database not available. Reservation changes are disabled in demo mode.",
+                "Demo Mode",
+                JOptionPane.INFORMATION_MESSAGE);
     }
 }
