@@ -1,6 +1,6 @@
 package com.hotel;
 
-import com.hotel.gui.Auth.LoginFrame;
+import com.hotel.dto.Auth.LoginFrame;
 import com.hotel.util.DatabaseConnection;
 import javax.swing.*;
 import java.awt.*;

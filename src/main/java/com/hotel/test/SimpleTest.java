@@ -32,7 +32,7 @@ public class SimpleTest {
                     testUser.setFullName("Test Administrator");
                     testUser.setRole("admin");
                     testUser.setActive(true);
-                    com.hotel.gui.MainDashboard dashboard = new com.hotel.gui.MainDashboard(testUser);
+                    com.hotel.dto.MainDashboard dashboard = new com.hotel.dto.MainDashboard(testUser);
                     System.out.println("✅ Application started successfully!");
                     
                     // Close after 5 seconds for testing

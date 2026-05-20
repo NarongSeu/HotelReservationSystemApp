@@ -1,6 +1,6 @@
 package com.hotel.ui;
 
-import com.hotel.gui.Auth.LoginFrame;
+import com.hotel.dto.Auth.LoginFrame;
 import com.hotel.model.User;
 
 import javax.swing.*;
